@@ -1,30 +1,3 @@
-/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
-/***************************************************************************
- *            aboutbox.cpp
- *
- *  Thu Mar 28 12:17:00 UTC+1 2019
- *  Copyright 2019 Lars Bisballe
- *  larsbisballe@gmail.com
- ****************************************************************************/
-
-/*
- *  This file is part of Momaku.
- *
- *  Momaku is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  Momaku is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Momaku; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
- */
-
 #include "aboutbox.h"
 #include "version.h"
 
@@ -40,7 +13,7 @@
 
 AboutBox::AboutBox(QWidget *parent): QDialog(parent)
 {
-  setWindowTitle(tr("About Momaku"));
+  setWindowTitle(tr("About SentRec"));
   setFixedSize(590,500);
 
   // Read AUTHORS data from file
@@ -69,19 +42,21 @@ AboutBox::AboutBox(QWidget *parent): QDialog(parent)
 
   QHBoxLayout *topLayout = new QHBoxLayout();
   QLabel *logo = new QLabel();
+  logo->setScaledContents(true);
   logo->setPixmap(QPixmap(":icon.png"));
+  logo->setFixedSize(128, 128);
   QLabel *title = new QLabel;
   title->setWordWrap(true);
-  title->setText(tr("<h1>Momaku Client</h1>"
+  title->setText(tr("<h1>SentRec</h1>"
                     "<h2>Version ")
                  + QString("%1.%2.%3")
                  .arg(PROJECT_VERSION_MAJOR)
                  .arg(PROJECT_VERSION_MINOR)
                  .arg(PROJECT_VERSION_PATCH)
                  + tr("</h2>"
-                      "Copyright (c) ") + QDateTime::currentDateTime().toString("yyyy") +
-                 tr(" Lars Bisballe Jensen<br />"
-                    "Momaku is free software released under the terms "
+                      "SentRec Copyright (c) ") + QDateTime::currentDateTime().toString("yyyy") +
+                 tr(" Lars Muldjord<br />"
+                    "SentRec is free software released under the terms "
                     "of the GNU General Public License. Click the license "
                     "tab for full license information."));
   topLayout->addWidget(logo);
