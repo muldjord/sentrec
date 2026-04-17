@@ -3,10 +3,10 @@
 #include <QWidget>
 #include <QPushButton>
 #include <QVBoxLayout>
-#include <QAudioSource>
-#include <QAudioSink>
-#include <QMediaDevices>
-#include <QBuffer>
+#include <QAudioInput>
+#include <QAudioOutput>
+#include <QMediaCaptureSession>
+#include <QMediaRecorder>
 
 class AudioRecorder : public QWidget
 {
@@ -26,13 +26,9 @@ private:
   QPushButton *stopButton;
   QPushButton *playButton;
   
-  QAudioSource *audioSource = nullptr;
-  QAudioSink *audioSink = nullptr;
-  
-  QIODevice *inputDevice = nullptr;
-  
-  QByteArray audioData;  // raw float32 buffer
-  QBuffer playbackBuffer;
-  
-  QAudioFormat format;
+  QAudioInput *inputDevice = nullptr;
+  QAudioOutput *outputDevice = nullptr;
+
+  QMediaCaptureSession *captureSession = nullptr;
+  QMediaRecorder *recorder = nullptr;
 };

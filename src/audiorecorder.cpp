@@ -1,5 +1,8 @@
 #include "audiorecorder.h"
+
 #include <QDebug>
+#include <QMediaDevices>
+#include <QAudioDevice>
 
 AudioRecorder::AudioRecorder(QWidget *parent)
   : QWidget(parent)
@@ -17,65 +20,38 @@ AudioRecorder::AudioRecorder(QWidget *parent)
   connect(stopButton, &QPushButton::clicked, this, &AudioRecorder::stopRecording);
   connect(playButton, &QPushButton::clicked, this, &AudioRecorder::playRecording);
 
-  // Define audio format (32-bit float)
-  format.setSampleRate(44100);
-  format.setChannelCount(1);
-  format.setSampleFormat(QAudioFormat::Float);
+  inputDevice = new QAudioInput;
+  inputDevice->setDevice(QMediaDevices::defaultAudioInput());
+  outputDevice = new QAudioOutput;
+  outputDevice->setDevice(QMediaDevices::defaultAudioOutput());
 
-  playbackBuffer.setBuffer(&audioData);
-
-  audioSink = new QAudioSink(format, this);
+  captureSession = new QMediaCaptureSession(this);
+  captureSession->setAudioInput(inputDevice);
+  captureSession->setAudioOutput(outputDevice);
+  recorder = new QMediaRecorder;
+  recorder->setAudioBitRate(32);
+  recorder->setAudioChannelCount(1);
+  recorder->setAudioSampleRate(48000);
+  captureSession->setRecorder(recorder);
 
   setLayout(layout);
 }
 
 AudioRecorder::~AudioRecorder()
 {
-  delete audioSource;
-  delete audioSink;
 }
 
 void AudioRecorder::startRecording()
 {
-  audioSink->stop();
-  audioData.clear();
-
-  auto device = QMediaDevices::defaultAudioInput();
-
-  audioSource = new QAudioSource(device, format, this);
-
-  inputDevice = audioSource->start();
-
-  connect(inputDevice, &QIODevice::readyRead, this, [this]() {
-    audioData.append(inputDevice->readAll());
-  });
-
   qDebug() << "Recording started";
 }
 
 void AudioRecorder::stopRecording()
 {
-  if(audioSource) {
-    audioSource->stop();
-    audioSource->deleteLater();
-    audioSource = nullptr;
-  }
-
-  qDebug() << "Recording stopped. Bytes:" << audioData.size();
+  qDebug() << "Recording stopped.";
 }
 
 void AudioRecorder::playRecording()
 {
-  if(audioData.isEmpty()) {
-    qDebug() << "No audio recorded";
-    return;
-  }
-
-  playbackBuffer.close();
-  playbackBuffer.setData(audioData);
-  playbackBuffer.open(QIODevice::ReadOnly);
-
-  audioSink->start(&playbackBuffer);
-
   qDebug() << "Playback started";
 }
