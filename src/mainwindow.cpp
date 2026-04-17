@@ -100,8 +100,8 @@ void MainWindow::createMainLayout()
 {
   setCentralWidget(new QWidget(this));
 
-  /*
   sentenceList = new SentenceList(this);
+  /*
   connect(diabetesInfo, &DiabetesInfo::updateDiabetesInfo,
           connStatus, &ConnStatus::updateDiabetesInfo);
   */
@@ -116,13 +116,11 @@ void MainWindow::createMainLayout()
   diabetesInfoBox->setLayout(diabetesInfoLayout);
   diabetesInfoBox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
   */
-  /*
   QVBoxLayout *layout = new QVBoxLayout();
-  layout->addWidget(diabetesInfoBox);
-  layout->addWidget(tabWidget);
+  layout->addWidget(sentenceList);
+  layout->addWidget(audioRecorder);
 
   centralWidget()->setLayout(layout);
-  */
 
   qInfo("Created main layout...\n");
 }
