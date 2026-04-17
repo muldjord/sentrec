@@ -44,7 +44,7 @@ void MainWindow::init()
 
 void MainWindow::createActions()
 {
-  quitAct = new QAction(QIcon(":logout.png"), tr("&Logout"), this);
+  quitAct = new QAction(QIcon(":quit.png"), tr("&Quit"), this);
   connect(quitAct, &QAction::triggered, this, &MainWindow::close);
 
   preferencesAct = new QAction(QIcon(":preferences.png"), tr("&Preferences..."), this);
