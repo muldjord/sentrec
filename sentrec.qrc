@@ -1,0 +1,11 @@
+<!DOCTYPE RCC>
+  <RCC version="1.0">
+  <qresource prefix="/">
+    <file alias="LICENSE">LICENSE</file>
+    <file alias="AUTHORS">AUTHORS</file>
+    <file alias="about.png">icons/about.png</file>
+    <file alias="icon.png">icons/icon.png</file>
+    <file alias="preferences.png">icons/preferences.png</file>
+    <file alias="quit.png">icons/quit.png</file>
+  </qresource>
+</RCC>
