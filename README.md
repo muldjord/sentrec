@@ -1,7 +1,7 @@
 # SentRec
 A sentence recorder specifically catered to Piper TTS training recordings.
 
-Note that this project is currently in heavy development. Code might not even compile at this stage.
+Note that this project is currently in heavy development. Code might not even compile at this stage. It might not even function in any meaningful way. I will update this notice when the software reaches a state where it is somewhat useful.
 
 The aim is to create an audio recorder catered to the workflow required when recording a large sentence dataset (text + audio) that can be used to train text to speech models. This software is specifically designed to work with the Piper Text-To-Speech format of `ID|Sentence` lines in a CSV file (with `|` being the delimiter) with corresponding `wav/ID.wav` files.
 
