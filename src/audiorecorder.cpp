@@ -24,6 +24,8 @@ AudioRecorder::AudioRecorder(QWidget *parent)
 
   playbackBuffer.setBuffer(&audioData);
 
+  audioSink = new QAudioSink(format, this);
+
   setLayout(layout);
 }
 
@@ -35,6 +37,7 @@ AudioRecorder::~AudioRecorder()
 
 void AudioRecorder::startRecording()
 {
+  audioSink->stop();
   audioData.clear();
 
   auto device = QMediaDevices::defaultAudioInput();
@@ -72,7 +75,6 @@ void AudioRecorder::playRecording()
   playbackBuffer.setData(audioData);
   playbackBuffer.open(QIODevice::ReadOnly);
 
-  audioSink = new QAudioSink(format, this);
   audioSink->start(&playbackBuffer);
 
   qDebug() << "Playback started";
