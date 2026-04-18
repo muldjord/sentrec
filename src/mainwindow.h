@@ -24,7 +24,6 @@ protected slots:
   void closeEvent(QCloseEvent *event);
 
 private slots:
-  void init();
   void showAbout();
   void showPreferences();
   

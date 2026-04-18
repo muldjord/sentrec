@@ -101,11 +101,6 @@ void MainWindow::createMainLayout()
   qInfo("Created main layout...");
 }
 
-void MainWindow::createStatusBar()
-{
-  setStatusBar(new QStatusBar(this));
-}
-
 void MainWindow::showAbout()
 {
   AboutBox aboutBox(this);
