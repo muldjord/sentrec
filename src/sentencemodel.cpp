@@ -92,6 +92,7 @@ bool SentenceModel::setData(const QModelIndex &index, const QVariant &value, int
   }
 
   tableData[index.row()][index.column()] = value.toString();
+  mainWindow->setWindowModified(true);
   emit dataChanged(index, index); // Inform the model that this index has changed
   return true;
 }
@@ -101,4 +102,9 @@ void SentenceModel::setAllData(const QVector<QVector<QString> > &data)
   beginResetModel();
   tableData = data;
   endResetModel();
+}
+
+const QVector<QVector<QString> > &SentenceModel::getAllData() const
+{
+  return tableData;
 }

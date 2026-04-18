@@ -20,6 +20,7 @@ public:
   Qt::ItemFlags flags(const QModelIndex &index) const override;
   bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
   void setAllData(const QVector<QVector<QString> > &data);
+  const QVector<QVector<QString> > &getAllData() const;
   
   //bool insertRows(int position, int rows, const QModelIndex &parent = QModelIndex());
   //bool insertColumns(int position, int columns, const QModelIndex &parent = QModelIndex());

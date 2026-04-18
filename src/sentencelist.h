@@ -21,9 +21,11 @@ public slots:
 
 private slots:
   void loadSentences();
+  void saveSentences();
   void deleteSentence();
 
 private:
+  QString sentenceFileString = "";
   SentenceModel *sentenceModel = nullptr;
   QTableView *sentenceView;
 
