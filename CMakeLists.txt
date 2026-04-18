@@ -35,11 +35,8 @@ pkg_check_modules(SNDFILE REQUIRED sndfile)
 
 set(SOURCES
   src/aboutbox.cpp
+  src/audioprocessor.cpp
   src/audiorecorder.cpp
-  src/sentencelist.cpp
-  src/sentencemodel.cpp
-  src/wavhandler.cpp
-  src/waveformwidget.cpp
   src/main.cpp
   src/mainwindow.cpp
   src/preferences/configcheckbox.cpp
@@ -50,6 +47,10 @@ set(SOURCES
   src/preferences/configpathedit.cpp
   src/preferences/configslider.cpp
   src/preferences/configtextedit.cpp
+  src/sentencelist.cpp
+  src/sentencemodel.cpp
+  src/waveformwidget.cpp
+  src/wavhandler.cpp
 )
 
 qt_add_executable(SentRec

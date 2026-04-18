@@ -1,4 +1,5 @@
 #include "audiorecorder.h"
+#include "audioprocessor.h"
 #include "wavhandler.h"
 #include "settings.h"
 
@@ -101,6 +102,10 @@ void AudioRecorder::stopRecording()
   if(audioIn) {
     audioIn->disconnect(this);
   }
+  buffer = AudioProcessor::cutSilence(buffer);
+  buffer = AudioProcessor::normalize(buffer);
+  buffer = AudioProcessor::fadeEnds(buffer);
+  
   waveformWidget->setSamples(buffer);
 }
 
