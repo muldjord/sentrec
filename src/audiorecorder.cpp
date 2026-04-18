@@ -51,7 +51,7 @@ void AudioRecorder::startRecording()
   if(!audioSource) {
     return;
   }
-  qInfo("Recording started!");
+  qInfo("Starting recording!");
   audioIn = audioSource->start();
 
   buffer.clear();
@@ -72,7 +72,7 @@ void AudioRecorder::startRecording()
 
 void AudioRecorder::stopRecording()
 {
-  qDebug("Stopped recording!");
+  qDebug("Stopping recording!");
   if(audioIn) {
     audioIn->disconnect(this);
   }
@@ -80,7 +80,13 @@ void AudioRecorder::stopRecording()
 
 void AudioRecorder::playRecording()
 {
-  qDebug("Playback started!");
+  qDebug("Starting playback!");
+
+  // If currently playing, don't play again until it's done!
+  if(audioSink && audioSink->state() == QAudio::ActiveState) {
+    return;
+  }
+
   audioOut = audioSink->start();
   if(audioOut) {
     const char* dataPtr = reinterpret_cast<const char*>(buffer.constData());
