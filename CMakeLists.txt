@@ -30,11 +30,15 @@ qt_add_resources(QT_RESOURCES
   sentrec.qrc
 )
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(SNDFILE REQUIRED sndfile)
+
 set(SOURCES
   src/aboutbox.cpp
   src/audiorecorder.cpp
   src/sentencelist.cpp
   src/sentencemodel.cpp
+  src/wavhandler.cpp
   src/main.cpp
   src/mainwindow.cpp
   src/preferences/configcheckbox.cpp
@@ -52,8 +56,8 @@ qt_add_executable(SentRec
   ${QT_RESOURCES}
   ${APP_ICON_RESOURCE}
 )
-
-target_link_libraries(SentRec PRIVATE Qt6::Widgets Qt6::Multimedia)
+target_include_directories(SentRec PRIVATE ${SNDFILE_INCLUDE_DIRS})
+target_link_libraries(SentRec PRIVATE Qt6::Widgets Qt6::Multimedia ${SNDFILE_LIBRARIES})
 
 set_target_properties(SentRec PROPERTIES
   COMPILE_WARNING_AS_ERROR ON
