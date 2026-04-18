@@ -91,7 +91,8 @@ void MainWindow::createMainLayout()
   sentenceList = new SentenceList(this);
   audioRecorder = new AudioRecorder(this);
 
-  connect(sentenceList, &SentenceList::sentenceChanged, audioRecorder, &AudioRecorder::loadWav);
+  connect(sentenceList, &SentenceList::leavingSentence, audioRecorder, &AudioRecorder::saveToDisk);
+  connect(sentenceList, &SentenceList::enteringSentence, audioRecorder, &AudioRecorder::loadFromDisk);
 
   QVBoxLayout *layout = new QVBoxLayout();
   layout->addWidget(sentenceList);

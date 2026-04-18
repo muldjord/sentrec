@@ -22,7 +22,8 @@ public slots:
   void clearSentenceList();
 
 signals:
-  void sentenceChanged(const QString &sentenceId);
+  void leavingSentence(const QString &sentenceId);
+  void enteringSentence(const QString &sentenceId);
 
 private slots:
   void loadSentences();
@@ -31,7 +32,6 @@ private slots:
   void selectionChanged(const QModelIndex &current, const QModelIndex &previous);
 
 private:
-  QFileInfo sentenceFileInfo;
   SentenceModel *sentenceModel = nullptr;
   QTableView *sentenceView;
 

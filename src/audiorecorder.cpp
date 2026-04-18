@@ -1,8 +1,12 @@
 #include "audiorecorder.h"
+#include "wavhandler.h"
+#include "settings.h"
 
 #include <QDebug>
 #include <QMediaDevices>
 #include <QAudioDevice>
+
+extern Settings settings;
 
 AudioRecorder::AudioRecorder(QWidget *parent)
   : QWidget(parent)
@@ -12,7 +16,7 @@ AudioRecorder::AudioRecorder(QWidget *parent)
   playButton = new QPushButton(tr("Play"));
   nextButton = new QPushButton(tr("Next"));
 
-  auto layout = new QVBoxLayout(this);
+  auto layout = new QHBoxLayout(this);
   layout->addWidget(recordButton);
   layout->addWidget(stopButton);
   layout->addWidget(playButton);
@@ -29,7 +33,7 @@ AudioRecorder::AudioRecorder(QWidget *parent)
   QAudioDevice outputDevice = QMediaDevices::defaultAudioOutput();
   
   QAudioFormat format;
-  format.setSampleRate(44100);
+  format.setSampleRate(settings.sampleRate);
   format.setChannelCount(1);
   format.setSampleFormat(QAudioFormat::Float);
   
@@ -41,9 +45,23 @@ AudioRecorder::~AudioRecorder()
 {
 }
 
-void AudioRecorder::loadWav(const QString &id)
+void AudioRecorder::loadFromDisk(const QString &id)
 {
   qInfo("Loading wav with id '%s' into audio recorder", qPrintable(id));
+  buffer = loadWav(settings.sentenceFileInfo.absolutePath() + "/wav/" + id + ".wav");
+}
+
+bool AudioRecorder::saveToDisk(const QString &id)
+{
+  if(buffer.isEmpty()) {
+    qDebug("Should I save to disk? No, buffer is empty, ignoring.");
+    return true;
+  }
+  qInfo("Saving wav to disk with id '%s'", qPrintable(id));
+  if(saveWav(settings.sentenceFileInfo.absolutePath() + "/wav/" + id + ".wav", buffer, settings.sampleRate)) {
+    return true;
+  }
+  return false;
 }
 
 void AudioRecorder::startRecording()

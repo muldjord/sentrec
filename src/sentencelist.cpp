@@ -1,6 +1,7 @@
 #include "sentencelist.h"
 #include "sentencemodel.h"
 #include "mainwindow.h"
+#include "settings.h"
 
 #include <QLabel>
 #include <QHBoxLayout>
@@ -10,6 +11,7 @@
 #include <QHeaderView>
 
 extern MainWindow *mainWindow;
+extern Settings settings;
 
 SentenceList::SentenceList(QWidget *parent)
   : QWidget(parent)
@@ -63,9 +65,9 @@ void SentenceList::loadSentences()
     return;
   }
 
-  sentenceFileInfo = QFileInfo(sentenceFileString);
+  settings.sentenceFileInfo = QFileInfo(sentenceFileString);
 
-  QFile sentenceFile(sentenceFileInfo.absoluteFilePath());
+  QFile sentenceFile(settings.sentenceFileInfo.absoluteFilePath());
   QVector<QVector<QString> > sentences;
   if(sentenceFile.open(QIODevice::ReadOnly)) {
     QString backupFileString = sentenceFile.fileName() + ".bu" + QDateTime::currentDateTime().toString("yyyyMMdd-HHmmss");
@@ -108,7 +110,7 @@ void SentenceList::setSentences(const QVector<QVector<QString> > &data)
   mainWindow->setWindowModified(false);
 
   // Find and select the first sentence that does not have a corresponding wav file
-  QString wavPath = sentenceFileInfo.absolutePath() + "/wav";
+  QString wavPath = settings.sentenceFileInfo.absolutePath() + "/wav";
   QDir wavDir(wavPath, "*.wav", QDir::Name, QDir::Files);
   if(!wavDir.exists() && !wavDir.mkpath(wavPath)) {
     QMessageBox::critical(this, tr("Output wav folder could not be created"),
@@ -133,13 +135,13 @@ void SentenceList::setSentences(const QVector<QVector<QString> > &data)
 
 void SentenceList::saveSentences()
 {
-  if(!sentenceFileInfo.isFile()) {
+  if(!settings.sentenceFileInfo.isFile()) {
     return;
   }
 
-  qInfo("Saving all sentences back to '%s'...", qPrintable(sentenceFileInfo.absoluteFilePath()));
+  qInfo("Saving all sentences back to '%s'...", qPrintable(settings.sentenceFileInfo.absoluteFilePath()));
   const QVector<QVector<QString> > &tableData = sentenceModel->getAllData();
-  QFile sentenceFile(sentenceFileInfo.absoluteFilePath());
+  QFile sentenceFile(settings.sentenceFileInfo.absoluteFilePath());
   if(sentenceFile.open(QIODevice::WriteOnly)) {
     for(const auto &row: tableData) {
       if(row.size() != 2) {
@@ -183,7 +185,13 @@ void SentenceList::clearSentenceList()
 
 void SentenceList::selectionChanged(const QModelIndex &current, const QModelIndex &previous)
 {
-  QString sentenceId = sentenceModel->getRowIdString(current.row());
-  qDebug("Row %d with id %s selected.", current.row(), qPrintable(sentenceId));
-  emit sentenceChanged(sentenceId);
+  if(previous.isValid()) {
+    QString oldId = sentenceModel->getRowIdString(previous.row());
+    qDebug("Leaving row %d with id '%s'.", previous.row(), qPrintable(oldId));
+    emit leavingSentence(oldId);
+  }
+
+  QString newId = sentenceModel->getRowIdString(current.row());
+  qDebug("Entering row %d with id '%s'.", current.row(), qPrintable(newId));
+  emit enteringSentence(newId);
 }

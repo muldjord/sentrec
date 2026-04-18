@@ -16,7 +16,8 @@ public:
   ~AudioRecorder();
 
 public slots:
-  void loadWav(const QString &id);
+  void loadFromDisk(const QString &id);
+  bool saveToDisk(const QString &id);
 		  
 private slots:
   void startRecording();
