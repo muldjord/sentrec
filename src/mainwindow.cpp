@@ -24,10 +24,10 @@ MainWindow::MainWindow()
                  .arg(PROJECT_VERSION_PATCH)
                  + "[*]");
 
-  createStatusBar();
+  //createStatusBar();
   createActions();
   createMenus();
-  createToolBar();
+  //createToolBar();
   createMainLayout();
   
   //QTimer::singleShot(500, this, &MainWindow::init);
