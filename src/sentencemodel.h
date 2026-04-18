@@ -22,7 +22,8 @@ public:
   bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
   void setAllData(const QVector<QVector<QString> > &data);
   const QVector<QVector<QString> > &getAllData() const;
-  
+  const QString &getRowIdString(const qint64 &row) const;
+
   //bool insertRows(int position, int rows, const QModelIndex &parent = QModelIndex());
   //bool insertColumns(int position, int columns, const QModelIndex &parent = QModelIndex());
   //bool removeRows(int position, int rows, const QModelIndex &parent = QModelIndex());

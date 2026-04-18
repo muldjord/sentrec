@@ -4,9 +4,11 @@
 
 #include <QWidget>
 #include <QTableView>
+#include <QItemSelectionModel>
 #include <QMenu>
 #include <QContextMenuEvent>
 #include <QSettings>
+#include <QFileInfo>
 
 class SentenceList : public QWidget
 {
@@ -19,13 +21,17 @@ public slots:
   void setSentences(const QVector<QVector<QString> > &data);
   void clearSentenceList();
 
+signals:
+  void sentenceChanged(const QString &sentenceId);
+
 private slots:
   void loadSentences();
   void saveSentences();
   void removeSentence();
+  void selectionChanged(const QModelIndex &current, const QModelIndex &previous);
 
 private:
-  QString sentenceFileString = "";
+  QFileInfo sentenceFileInfo;
   SentenceModel *sentenceModel = nullptr;
   QTableView *sentenceView;
 

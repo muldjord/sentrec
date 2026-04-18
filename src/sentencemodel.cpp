@@ -117,3 +117,8 @@ const QVector<QVector<QString> > &SentenceModel::getAllData() const
 {
   return tableData;
 }
+
+const QString &SentenceModel::getRowIdString(const qint64 &row) const
+{
+  return tableData[row][0];
+}
