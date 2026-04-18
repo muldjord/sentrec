@@ -89,8 +89,9 @@ void MainWindow::createMainLayout()
   setCentralWidget(new QWidget(this));
 
   sentenceList = new SentenceList(this);
-
   audioRecorder = new AudioRecorder(this);
+
+  connect(sentenceList, &SentenceList::sentenceChanged, audioRecorder, &AudioRecorder::loadWav);
 
   QVBoxLayout *layout = new QVBoxLayout();
   layout->addWidget(sentenceList);
