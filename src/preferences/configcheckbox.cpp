@@ -11,8 +11,11 @@ ConfigCheckBox::ConfigCheckBox(QSettings &settings, QString caption, QString gro
   }
   setChecked(settings.value(key, defaultValue).toBool());
   setToolTip(tr("Default value: ") + QString(defaultValue?tr("true"):tr("false")));
-  
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0) 
   connect(this, &ConfigCheckBox::checkStateChanged, this, &ConfigCheckBox::saveToConfig);
+#else
+  connect(this, &ConfigCheckBox::toggled, this, &ConfigCheckBox::saveToConfig);
+#endif
   refreshState();
 }
 
