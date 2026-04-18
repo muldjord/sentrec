@@ -7,34 +7,34 @@
 AudioRecorder::AudioRecorder(QWidget *parent)
   : QWidget(parent)
 {
-  recordButton = new QPushButton("Record");
-  stopButton = new QPushButton("Stop");
-  playButton = new QPushButton("Play");
+  recordButton = new QPushButton(tr("Record"));
+  stopButton = new QPushButton(tr("Stop"));
+  playButton = new QPushButton(tr("Play"));
+  nextButton = new QPushButton(tr("Next"));
 
   auto layout = new QVBoxLayout(this);
   layout->addWidget(recordButton);
   layout->addWidget(stopButton);
   layout->addWidget(playButton);
+  layout->addWidget(nextButton);
 
   connect(recordButton, &QPushButton::clicked, this, &AudioRecorder::startRecording);
   connect(stopButton, &QPushButton::clicked, this, &AudioRecorder::stopRecording);
   connect(playButton, &QPushButton::clicked, this, &AudioRecorder::playRecording);
-
-  inputDevice = new QAudioInput;
-  inputDevice->setDevice(QMediaDevices::defaultAudioInput());
-  outputDevice = new QAudioOutput;
-  outputDevice->setDevice(QMediaDevices::defaultAudioOutput());
-
-  captureSession = new QMediaCaptureSession(this);
-  captureSession->setAudioInput(inputDevice);
-  captureSession->setAudioOutput(outputDevice);
-  recorder = new QMediaRecorder;
-  recorder->setAudioBitRate(32);
-  recorder->setAudioChannelCount(1);
-  recorder->setAudioSampleRate(48000);
-  captureSession->setRecorder(recorder);
+  connect(nextButton, &QPushButton::clicked, this, &AudioRecorder::nextRecording);
 
   setLayout(layout);
+
+  QAudioDevice inputDevice = QMediaDevices::defaultAudioInput();
+  QAudioDevice outputDevice = QMediaDevices::defaultAudioOutput();
+  
+  QAudioFormat format;
+  format.setSampleRate(44100);
+  format.setChannelCount(1);
+  format.setSampleFormat(QAudioFormat::Float);
+  
+  audioSource = new QAudioSource(inputDevice, format, this);
+  audioSink = new QAudioSink(outputDevice, format, this);
 }
 
 AudioRecorder::~AudioRecorder()
@@ -48,15 +48,53 @@ void AudioRecorder::loadWav(const QString &id)
 
 void AudioRecorder::startRecording()
 {
-  qDebug() << "Recording started";
+  if(!audioSource) {
+    return;
+  }
+  qInfo("Recording started!");
+  audioIn = audioSource->start();
+
+  buffer.clear();
+  
+  connect(audioIn, &QIODevice::readyRead, this, [this]() {
+    QByteArray data = audioIn->readAll();
+
+    const float* samples = reinterpret_cast<const float*>(data.constData());
+    qint64 sampleCount = data.size() / sizeof(float);
+
+    buffer.reserve(sampleCount);
+    
+    for(int i = 0; i < sampleCount; ++i) {
+      buffer.append(samples[i]);
+    }
+  });
 }
 
 void AudioRecorder::stopRecording()
 {
-  qDebug() << "Recording stopped.";
+  qDebug("Stopped recording!");
+  if(audioIn) {
+    audioIn->disconnect(this);
+  }
 }
 
 void AudioRecorder::playRecording()
 {
-  qDebug() << "Playback started";
+  qDebug("Playback started!");
+  audioOut = audioSink->start();
+  if(audioOut) {
+    const char* dataPtr = reinterpret_cast<const char*>(buffer.constData());
+    qsizetype byteCount = buffer.size() * sizeof(float);
+    audioOut->write(dataPtr, byteCount);
+  }
+}
+
+void AudioRecorder::nextRecording()
+{
+  qDebug("Moving to next recording!");
+  /*
+  if(audioIn) {
+    audioIn->disconnect(this);
+  }
+  */
 }

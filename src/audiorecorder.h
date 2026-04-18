@@ -3,10 +3,9 @@
 #include <QWidget>
 #include <QPushButton>
 #include <QVBoxLayout>
-#include <QAudioInput>
-#include <QAudioOutput>
 #include <QMediaCaptureSession>
-#include <QMediaRecorder>
+#include <QAudioSource>
+#include <QAudioSink>
 
 class AudioRecorder : public QWidget
 {
@@ -21,17 +20,21 @@ public slots:
 		  
 private slots:
   void startRecording();
-  void stopRecording();
+  void stopRecording(); 
   void playRecording();
+  void nextRecording();
 
 private:
-  QPushButton *recordButton;
-  QPushButton *stopButton;
-  QPushButton *playButton;
+  QPushButton *recordButton = nullptr;
+  QPushButton *stopButton = nullptr;
+  QPushButton *playButton = nullptr;
+  QPushButton *nextButton = nullptr;
   
-  QAudioInput *inputDevice = nullptr;
-  QAudioOutput *outputDevice = nullptr;
+  QAudioSource *audioSource = nullptr;
+  QAudioSink *audioSink = nullptr;
+  
+  QIODevice *audioIn = nullptr;
+  QIODevice *audioOut = nullptr;
 
-  QMediaCaptureSession *captureSession = nullptr;
-  QMediaRecorder *recorder = nullptr;
+  QVector<float> buffer;
 };
