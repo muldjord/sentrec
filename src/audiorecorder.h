@@ -1,5 +1,7 @@
 #pragma once
 
+#include "waveformwidget.h"
+
 #include <QWidget>
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -26,6 +28,7 @@ private slots:
   void nextRecording();
 
 private:
+  WaveformWidget *waveformWidget = nullptr;
   QPushButton *recordButton = nullptr;
   QPushButton *stopButton = nullptr;
   QPushButton *playButton = nullptr;

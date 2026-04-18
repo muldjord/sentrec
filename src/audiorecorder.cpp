@@ -11,23 +11,29 @@ extern Settings settings;
 AudioRecorder::AudioRecorder(QWidget *parent)
   : QWidget(parent)
 {
+  waveformWidget = new WaveformWidget(this);
   recordButton = new QPushButton(tr("Record"));
   stopButton = new QPushButton(tr("Stop"));
   playButton = new QPushButton(tr("Play"));
   nextButton = new QPushButton(tr("Next"));
 
-  auto layout = new QHBoxLayout(this);
-  layout->addWidget(recordButton);
-  layout->addWidget(stopButton);
-  layout->addWidget(playButton);
-  layout->addWidget(nextButton);
+  auto vLayout = new QVBoxLayout(this);
+  vLayout->addWidget(waveformWidget);
+
+  auto hLayout = new QHBoxLayout(this);
+  hLayout->addWidget(recordButton);
+  hLayout->addWidget(stopButton);
+  hLayout->addWidget(playButton);
+  hLayout->addWidget(nextButton);
+
+  vLayout->addLayout(hLayout);
 
   connect(recordButton, &QPushButton::clicked, this, &AudioRecorder::startRecording);
   connect(stopButton, &QPushButton::clicked, this, &AudioRecorder::stopRecording);
   connect(playButton, &QPushButton::clicked, this, &AudioRecorder::playRecording);
   connect(nextButton, &QPushButton::clicked, this, &AudioRecorder::nextRecording);
 
-  setLayout(layout);
+  setLayout(vLayout);
 
   QAudioDevice inputDevice = QMediaDevices::defaultAudioInput();
   QAudioDevice outputDevice = QMediaDevices::defaultAudioOutput();
@@ -49,6 +55,7 @@ void AudioRecorder::loadFromDisk(const QString &id)
 {
   qInfo("Loading wav with id '%s' into audio recorder", qPrintable(id));
   buffer = loadWav(settings.sentenceFileInfo.absolutePath() + "/wav/" + id + ".wav");
+  waveformWidget->setSamples(buffer);
 }
 
 bool AudioRecorder::saveToDisk(const QString &id)
@@ -94,6 +101,7 @@ void AudioRecorder::stopRecording()
   if(audioIn) {
     audioIn->disconnect(this);
   }
+  waveformWidget->setSamples(buffer);
 }
 
 void AudioRecorder::playRecording()
