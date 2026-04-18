@@ -3,7 +3,7 @@
 #include <QFileInfo>
 
 struct Settings {
-  int sampleRate = 44100;
+  int sampleRate = 48000;
   QFileInfo sentenceFileInfo;
   // Settings here
 };
