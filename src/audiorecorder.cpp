@@ -6,37 +6,16 @@
 #include <QDebug>
 #include <QMediaDevices>
 #include <QAudioDevice>
+#include <QLabel>
 
 extern Settings settings;
 
 AudioRecorder::AudioRecorder(QWidget *parent)
   : QWidget(parent)
 {
-  waveformWidget = new WaveformWidget(this);
-  recordButton = new QPushButton(tr("Record"));
-  stopButton = new QPushButton(tr("Stop"));
-  playButton = new QPushButton(tr("Play"));
-  nextButton = new QPushButton(tr("Next"));
-
-  auto vLayout = new QVBoxLayout;
-  vLayout->addWidget(waveformWidget);
-
-  auto hLayout = new QHBoxLayout;
-  hLayout->addWidget(recordButton);
-  hLayout->addWidget(stopButton);
-  hLayout->addWidget(playButton);
-  hLayout->addWidget(nextButton);
-
-  vLayout->addLayout(hLayout);
-
-  connect(recordButton, &QPushButton::clicked, this, &AudioRecorder::startRecording);
-  connect(stopButton, &QPushButton::clicked, this, &AudioRecorder::stopRecording);
-  connect(playButton, &QPushButton::clicked, this, &AudioRecorder::playRecording);
-  connect(nextButton, &QPushButton::clicked, this, &AudioRecorder::nextRecording);
-
-  setLayout(vLayout);
-
   QAudioDevice inputDevice = QMediaDevices::defaultAudioInput();
+  qInfo("Default device description is: %s", qPrintable(inputDevice.description()));
+  qInfo("Default device id is: %s", qPrintable(inputDevice.id()));
   QAudioDevice outputDevice = QMediaDevices::defaultAudioOutput();
   
   QAudioFormat format;
@@ -44,8 +23,46 @@ AudioRecorder::AudioRecorder(QWidget *parent)
   format.setChannelCount(1);
   format.setSampleFormat(QAudioFormat::Float);
   
-  audioSource = new QAudioSource(inputDevice, format, this);
   audioSink = new QAudioSink(outputDevice, format, this);
+
+  QLabel *deviceLabel = new QLabel(tr("Input device:"));
+  deviceCombo = new QComboBox;
+  for(const auto &device: QMediaDevices::audioInputs()) {
+    deviceCombo->addItem(device.description(), device.id());
+    if(inputDevice.id() == device.id()) {
+      deviceCombo->setCurrentIndex(deviceCombo->count() - 1);
+    }
+  }
+  connect(deviceCombo, &QComboBox::currentIndexChanged, this, &AudioRecorder::deviceChanged);
+  
+  waveformWidget = new WaveformWidget;
+  recordButton = new QPushButton(tr("Record"));
+  stopButton = new QPushButton(tr("Stop"));
+  playButton = new QPushButton(tr("Play"));
+  nextButton = new QPushButton(tr("Next"));
+
+  auto deviceLayout = new QHBoxLayout;
+  deviceLayout->addWidget(deviceLabel);
+  deviceLayout->addWidget(deviceCombo);
+  deviceLayout->addStretch(1);
+
+  auto buttonLayout = new QHBoxLayout;
+  buttonLayout->addWidget(recordButton);
+  buttonLayout->addWidget(stopButton);
+  buttonLayout->addWidget(playButton);
+  buttonLayout->addWidget(nextButton);
+
+  auto vLayout = new QVBoxLayout;
+  vLayout->addLayout(deviceLayout);
+  vLayout->addWidget(waveformWidget);
+  vLayout->addLayout(buttonLayout);
+
+  connect(recordButton, &QPushButton::clicked, this, &AudioRecorder::startRecording);
+  connect(stopButton, &QPushButton::clicked, this, &AudioRecorder::stopRecording);
+  connect(playButton, &QPushButton::clicked, this, &AudioRecorder::playRecording);
+  connect(nextButton, &QPushButton::clicked, this, &AudioRecorder::nextRecording);
+
+  setLayout(vLayout);
 }
 
 AudioRecorder::~AudioRecorder()
@@ -134,4 +151,23 @@ void AudioRecorder::nextRecording()
     audioIn->disconnect(this);
   }
   */
+}
+
+void AudioRecorder::deviceChanged(int index)
+{
+  QAudioFormat format;
+  format.setSampleRate(settings.sampleRate);
+  format.setChannelCount(1);
+  format.setSampleFormat(QAudioFormat::Float);
+
+  QByteArray deviceId = deviceCombo->itemData(index).toByteArray();
+
+  for(const auto &device: QMediaDevices::audioInputs()) {
+    if(deviceId == device.id()) {
+      delete audioSource;
+      audioSource = new QAudioSource(device, format, this);
+      qInfo("Switched device to '%s'", qPrintable(deviceId));
+      break;
+    }
+  }
 }
