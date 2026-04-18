@@ -17,10 +17,10 @@ AudioRecorder::AudioRecorder(QWidget *parent)
   playButton = new QPushButton(tr("Play"));
   nextButton = new QPushButton(tr("Next"));
 
-  auto vLayout = new QVBoxLayout(this);
+  auto vLayout = new QVBoxLayout;
   vLayout->addWidget(waveformWidget);
 
-  auto hLayout = new QHBoxLayout(this);
+  auto hLayout = new QHBoxLayout;
   hLayout->addWidget(recordButton);
   hLayout->addWidget(stopButton);
   hLayout->addWidget(playButton);
