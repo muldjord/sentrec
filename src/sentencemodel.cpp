@@ -97,6 +97,15 @@ bool SentenceModel::setData(const QModelIndex &index, const QVariant &value, int
   return true;
 }
 
+bool SentenceModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+  beginRemoveRows(parent, row, row + count - 1);
+  tableData.removeAt(row);
+  endRemoveRows();
+
+  return true;
+}
+
 void SentenceModel::setAllData(const QVector<QVector<QString> > &data)
 {
   beginResetModel();

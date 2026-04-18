@@ -29,7 +29,7 @@ SentenceList::SentenceList(QWidget *parent)
 
   QPushButton *deleteSentenceButton = new QPushButton(QIcon(":remove.png"), tr("Delete selected sentence"), this);
   deleteSentenceButton->setIconSize(QSize(16, 16));
-  connect(deleteSentenceButton, &QPushButton::clicked, this, &SentenceList::deleteSentence);
+  connect(deleteSentenceButton, &QPushButton::clicked, this, &SentenceList::removeSentence);
 
   QVBoxLayout *buttonLayout = new QVBoxLayout();
   buttonLayout->addWidget(loadSentencesButton);
@@ -126,25 +126,21 @@ void SentenceList::saveSentences()
   }
 }
 
-void SentenceList::deleteSentence()
+void SentenceList::removeSentence()
 {
-  if(sentenceView->selectionModel() == nullptr) {
+  QList<QModelIndex> selectedRow = sentenceView->selectionModel()->selectedRows();
+  
+  if(selectedRow.isEmpty()) {
+    qInfo("No sentences selected!");
     return;
   }
-  /*
-  if(currentSentence.getSentenceUid() != MMK::NONE) {
-    QModelIndexList selected = sentenceView->selectionModel()->selectedRows();
-    if(!selected.isEmpty()) {
-      SentenceModel *sentenceModel = (SentenceModel *)sentenceView->model();
-      QList<SentenceData> sentences = sentenceModel->getRows(selected);
-      if(!sentences.isEmpty() && sentences.count() == 1) {
-        if(QMessageBox::question(this, tr("Delete sentence?"), tr("Are you sure you wish to delete the selected sentence?")) == QMessageBox::Yes) {
-          emit requestDeleteSentence(sentences.at(0).getSentenceUid());
-        }
-      }
-    }
-  }
-  */
+  
+  // This automatically calls removeRows (plural) in the selectionModel
+  int row = selectedRow.first().row();
+  qInfo("Removing row %d", row);
+  sentenceModel->removeRow(row);
+
+  saveSentences();
 }
 
 void SentenceList::clearSentenceList()

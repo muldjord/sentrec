@@ -22,7 +22,7 @@ public slots:
 private slots:
   void loadSentences();
   void saveSentences();
-  void deleteSentence();
+  void removeSentence();
 
 private:
   QString sentenceFileString = "";
