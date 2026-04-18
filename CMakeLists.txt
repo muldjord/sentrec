@@ -39,6 +39,7 @@ set(SOURCES
   src/sentencelist.cpp
   src/sentencemodel.cpp
   src/wavhandler.cpp
+  src/waveformwidget.cpp
   src/main.cpp
   src/mainwindow.cpp
   src/preferences/configcheckbox.cpp
