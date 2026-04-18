@@ -2,7 +2,7 @@
 #include <QVector>
 #include <QString>
 
-QVector<float> loadWav(const QString& path, int* sampleRateOut)
+QVector<float> loadWav(const QString &path, int *sampleRateOut)
 {
   SF_INFO info{};
   SNDFILE* file = sf_open(path.toStdString().c_str(), SFM_READ, &info);
@@ -24,14 +24,14 @@ QVector<float> loadWav(const QString& path, int* sampleRateOut)
   QVector<float> buffer;
   buffer.reserve(info.frames);
 
-  for (sf_count_t i = 0; i < info.frames; ++i) {
+  for(sf_count_t i = 0; i < info.frames; ++i) {
     buffer.append(interleaved[i * info.channels]); // channel 0 = left
   }
 
   return buffer;
 }
 
-bool saveWav(const QString& path, const QVector<float>& buffer, int sampleRate)
+bool saveWav(const QString &path, const QVector<float> &buffer, int sampleRate)
 {
   SF_INFO info{};
   info.channels = 1;
@@ -40,8 +40,9 @@ bool saveWav(const QString& path, const QVector<float>& buffer, int sampleRate)
   info.format = SF_FORMAT_WAV | SF_FORMAT_FLOAT;
 
   SNDFILE* file = sf_open(path.toStdString().c_str(), SFM_WRITE, &info);
-  if (!file)
+  if(!file) {
     return false;
+  }
 
   sf_writef_float(file, buffer.data(), buffer.size());
 
