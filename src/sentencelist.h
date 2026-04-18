@@ -20,6 +20,7 @@ public slots:
   void clearSentenceList();
 
 private slots:
+  void loadSentences();
   void deleteSentence();
 
 private:

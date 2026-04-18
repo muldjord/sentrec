@@ -11,10 +11,9 @@
 extern MainWindow *mainWindow;
 extern Settings settings;
 
-SentenceModel::SentenceModel(const QVector<QVector<QString> > &data, QObject *parent)
+SentenceModel::SentenceModel(QObject *parent)
   : QAbstractTableModel(parent)
 {
-  this->tableData = data;
   headers.append("ID");
   headers.append("Sentence");
 }
@@ -64,7 +63,7 @@ QVariant SentenceModel::headerData(int section, Qt::Orientation orientation, int
       if(orientation == Qt::Horizontal) {
         return headers[section];
       } else {
-        return QString::number(tableData.size());
+        return QString::number(section + 1);
       }
     }
   }
@@ -95,4 +94,11 @@ bool SentenceModel::setData(const QModelIndex &index, const QVariant &value, int
   tableData[index.row()][index.column()] = value.toString();
   emit dataChanged(index, index); // Inform the model that this index has changed
   return true;
+}
+
+void SentenceModel::setAllData(const QVector<QVector<QString> > &data)
+{
+  beginResetModel();
+  tableData = data;
+  endResetModel();
 }
