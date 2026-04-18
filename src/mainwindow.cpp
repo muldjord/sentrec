@@ -11,11 +11,14 @@
 #include <QStatusBar>
 #include <QMessageBox>
 
+QMainWindow *mainWindow = nullptr;
+
 extern QSettings *iniSettings;
 extern Settings settings;
 
 MainWindow::MainWindow()
 {
+  mainWindow = this;
   restoreGeometry(iniSettings->value("main/windowState", "").toByteArray());
   setWindowTitle("SentRec v" +
                  QString("%1.%2.%3")
@@ -24,22 +27,15 @@ MainWindow::MainWindow()
                  .arg(PROJECT_VERSION_PATCH)
                  + "[*]");
 
-  //createStatusBar();
   createActions();
   createMenus();
   //createToolBar();
   createMainLayout();
-  
-  //QTimer::singleShot(500, this, &MainWindow::init);
 }
 
 MainWindow::~MainWindow()
 {
   iniSettings->setValue("main/windowState", saveGeometry());
-}
-
-void MainWindow::init()
-{
 }
 
 void MainWindow::createActions()
@@ -53,7 +49,7 @@ void MainWindow::createActions()
   aboutAct = new QAction(QIcon(":about.png"), tr("&About..."), this);
   connect(aboutAct, &QAction::triggered, this, &MainWindow::showAbout);
 
-  qInfo("Created actions...\n");
+  qInfo("Created actions...");
 }
 
 void MainWindow::createMenus()
@@ -66,7 +62,6 @@ void MainWindow::createMenus()
   optionsMenu->addAction(preferencesAct);
 
   helpMenu = new QMenu(tr("&Help"), this);
-  //helpMenu->addAction(helpAct);
   helpMenu->addAction(aboutAct);
 
   menuBar = new QMenuBar();
@@ -76,7 +71,7 @@ void MainWindow::createMenus()
   
   setMenuBar(menuBar);
 
-  qInfo("Created menu...\n");
+  qInfo("Created menu...");
 }
 
 void MainWindow::createToolBar()
@@ -84,16 +79,9 @@ void MainWindow::createToolBar()
   QToolBar *mainFunctions = new QToolBar(tr("Main functions"));
   mainFunctions->setMovable(false);
 
-	//QWidget *spacerWidget = new QWidget(this);
-	//spacerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	//spacerWidget->setVisible(true);
-
-  //mainFunctions->addWidget(findPatient);
-  //mainFunctions->addSeparator();
-
   addToolBar(Qt::TopToolBarArea, mainFunctions);
 
-  qInfo("Created toolbar...\n");
+  qInfo("Created toolbar...");
 }
 
 void MainWindow::createMainLayout()
@@ -101,28 +89,16 @@ void MainWindow::createMainLayout()
   setCentralWidget(new QWidget(this));
 
   sentenceList = new SentenceList(this);
-  /*
-  connect(diabetesInfo, &DiabetesInfo::updateDiabetesInfo,
-          connStatus, &ConnStatus::updateDiabetesInfo);
-  */
+
   audioRecorder = new AudioRecorder(this);
 
-  //addDockWidget(Qt::RightDockWidgetArea, queue);
-
-  /*
-  QHBoxLayout *diabetesInfoLayout = new QHBoxLayout();
-  diabetesInfoLayout->addWidget(diabetesInfo);
-  QGroupBox *diabetesInfoBox = new QGroupBox(tr("Patient information"));
-  diabetesInfoBox->setLayout(diabetesInfoLayout);
-  diabetesInfoBox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
-  */
   QVBoxLayout *layout = new QVBoxLayout();
   layout->addWidget(sentenceList);
   layout->addWidget(audioRecorder);
 
   centralWidget()->setLayout(layout);
 
-  qInfo("Created main layout...\n");
+  qInfo("Created main layout...");
 }
 
 void MainWindow::createStatusBar()
@@ -145,7 +121,14 @@ void MainWindow::showPreferences()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
   if(isWindowModified()) {
-    QMessageBox::critical(this, tr("Unsaved data"), tr("There's unsaved data, please save it before quitting."), QMessageBox::Ok);
-    event->ignore();
+    QMessageBox::StandardButton button = QMessageBox::question(this, tr("Unsaved sentence edits!"),
+							       tr("You have unsaved sentence edits!\nAre you sure you want to quit?"),
+							       QMessageBox::Yes | QMessageBox::No,
+							       QMessageBox::No);
+    if(button == QMessageBox::Yes) {
+      event->accept();
+    } else {
+      event->ignore();
+    }
   }
 }
