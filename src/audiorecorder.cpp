@@ -41,6 +41,11 @@ AudioRecorder::~AudioRecorder()
 {
 }
 
+void AudioRecorder::loadWav(const QString &id)
+{
+  qInfo("Loading wav with id '%s' into audio recorder", qPrintable(id));
+}
+
 void AudioRecorder::startRecording()
 {
   qDebug() << "Recording started";

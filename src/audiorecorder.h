@@ -12,10 +12,13 @@ class AudioRecorder : public QWidget
 {
   Q_OBJECT
 
- public:
+public:
   AudioRecorder(QWidget *parent = nullptr);
   ~AudioRecorder();
 
+public slots:
+  void loadWav(const QString &id);
+		  
 private slots:
   void startRecording();
   void stopRecording();
