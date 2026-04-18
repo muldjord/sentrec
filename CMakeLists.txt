@@ -90,6 +90,7 @@ install(TARGETS SentRec
 install(FILES
   ${CMAKE_SOURCE_DIR}/AUTHORS
   ${CMAKE_SOURCE_DIR}/LICENSE
+  ${CMAKE_SOURCE_DIR}/example_sentences.csv
   ${CMAKE_SOURCE_DIR}/config.ini.example
   ${CMAKE_CURRENT_BINARY_DIR}/sentrec_da_DK.qm
   ${CMAKE_SOURCE_DIR}/README.md
