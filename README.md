@@ -40,7 +40,9 @@ I usually record in 44100 Hz. Piper wants wav files in either 22050 Hz (medium a
 
 SentRec records and saves samples as 32bit floating point values. This is not configurable! If your audio interface does not support it you will have problems. Most modern interfaces should have no issue though. Not making this configurable made the implementation of filters easier and ensures that there is enough resolution for amplifying the wav files later should you wish to do so.
 
-Now we are ready to record! The first sentence will be selected and it is simply a matter of clicking the `Record` button. Always remember to wait a second before starting to speak the sentence after clicking `Record`! SentRec trims the audio recording automatically (unless you disable it) and it uses the first 20 ms of audio to determine an average noise floor. So it is VERY important that you are quiet when clicking `Record`!
+Now we are ready to record! The first sentence will be selected and it is simply a matter of clicking the `Record` button. Two things to note here:
+1. Always take a breath BEFORE clicking record! Inhaling while recording might lead to the inhalation being part of the audio which will ruin your recordings!
+2. Always remember to wait a second before starting to speak the sentence after clicking `Record`! SentRec trims the audio recording automatically (unless you disable it) and it uses the first 20 ms of audio to determine an average noise floor. So it is VERY important that you are quiet when clicking `Record`!
 
 When you've spoken the sentence click the `Stop` button (same as the `Record` button). SentRec will immediately process the audio and render the resulting audio into the `Waveform view`. At this point the audio has also been saved as a wav file in the `wav` subdirectory (relative to you CSV file). You now have the option of either playing back the audio using the `Play` button or clicking `Next` to move on to the next sentence.
 
