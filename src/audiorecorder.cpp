@@ -37,7 +37,7 @@ AudioRecorder::AudioRecorder(QWidget *parent)
   recordButton = new QPushButton(tr("Record"));
   stopButton = new QPushButton(tr("Stop"));
   playButton = new QPushButton(tr("Play"));
-  nextButton = new QPushButton(tr("Next"));
+  nextButton = new QPushButton(tr("Record next"));
 
   auto deviceLayout = new QHBoxLayout;
   deviceLayout->addWidget(deviceLabel);
@@ -109,9 +109,8 @@ void AudioRecorder::startRecording()
   }
 
   qInfo("Starting recording!");
-  audioIn = audioSource->start();
-
   buffer.clear();
+  audioIn = audioSource->start();
   
   connect(audioIn, &QIODevice::readyRead, this, [this]() {
     QByteArray data = audioIn->readAll();
@@ -129,10 +128,16 @@ void AudioRecorder::startRecording()
 
 void AudioRecorder::stopRecording()
 {
+  if(audioIn == nullptr) {
+    return;
+  }
   qDebug("Stopping recording!");
+
   if(audioIn) {
     audioIn->disconnect(this);
   }
+  audioIn = nullptr;
+
   if(settings.autoTrim) {
     buffer = AudioProcessor::cutSilence(buffer);
   }
@@ -166,7 +171,10 @@ void AudioRecorder::playRecording()
 
 void AudioRecorder::nextRecording()
 {
-  qDebug("Moving to next recording!");
+  stopRecording();
+  qDebug("Moving to next sentence!");
+  emit selectNextSentence();
+  startRecording();
   /*
   if(audioIn) {
     audioIn->disconnect(this);
@@ -226,7 +234,9 @@ void AudioRecorder::setInputDevice()
   format.setSampleFormat(QAudioFormat::Float);
 
   if(audioSource) {
-    audioSource->stop();
+    if(audioSource->state() != QAudio::StoppedState) {
+      audioSource->stop();
+    }
     delete audioSource;
   }
   audioSource = new QAudioSource(settings.inputDevice, format, this);

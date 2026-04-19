@@ -22,6 +22,9 @@ public slots:
   void loadFromDisk(const QString &id);
   bool saveToDisk(const QString &id);
 		  
+signals:
+  void selectNextSentence();
+
 private slots:
   void inputDeviceChanged(int index);
   void samplerateChanged(int index);
