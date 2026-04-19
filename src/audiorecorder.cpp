@@ -85,6 +85,8 @@ void AudioRecorder::loadFromDisk(const QString &id)
 			     QMessageBox::Ok);
   }
   waveformWidget->setSamples(buffer);
+
+  settings.currentSentenceId = id;
 }
 
 bool AudioRecorder::saveToDisk(const QString &id)
@@ -127,9 +129,6 @@ void AudioRecorder::startRecording()
 
 void AudioRecorder::stopRecording()
 {
-  // Mark currently selected sentence dirty, so it will be saved to disk
-  emit markDirty();
-
   qDebug("Stopping recording!");
   if(audioIn) {
     audioIn->disconnect(this);
@@ -145,6 +144,8 @@ void AudioRecorder::stopRecording()
   }
   
   waveformWidget->setSamples(buffer);
+
+  saveToDisk(settings.currentSentenceId);
 }
 
 void AudioRecorder::playRecording()

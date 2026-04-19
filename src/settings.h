@@ -5,6 +5,7 @@
 
 struct Settings {
   QFileInfo sentenceFileInfo;
+  QString currentSentenceId = "";
 
   // Audio configs
   QAudioDevice inputDevice;

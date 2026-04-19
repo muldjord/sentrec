@@ -130,13 +130,3 @@ const QString &SentenceModel::getRowIdString(const qint64 &row) const
 {
   return tableData[row].id;
 }
-
-void SentenceModel::setDirty(const qint64 &row, const bool &dirty)
-{
-  tableData[row].dirty = dirty;
-}
-
-const bool &SentenceModel::isDirty(const qint64 &row) const
-{
-  return tableData[row].dirty;
-}

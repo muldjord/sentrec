@@ -20,11 +20,9 @@ public:
 public slots:
   void setSentences(const QVector<CellData> &data);
   void clearSentenceList();
-  void markCurrentDirty();
 
 signals:
   void sentencesLoaded();
-  void leavingSentence(const QString &sentenceId);
   void enteringSentence(const QString &sentenceId);
 
 private slots:

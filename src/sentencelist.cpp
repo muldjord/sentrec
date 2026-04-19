@@ -183,28 +183,16 @@ void SentenceList::clearSentenceList()
 
 void SentenceList::selectionChanged(const QModelIndex &current, const QModelIndex &previous)
 {
+  /*
   if(previous.isValid() && sentenceModel->isDirty(previous.row())) {
     QString oldId = sentenceModel->getRowIdString(previous.row());
     qDebug("Leaving row %d with id '%s'.", previous.row(), qPrintable(oldId));
     emit leavingSentence(oldId);
     sentenceModel->setDirty(previous.row(), false);
   }
+  */
 
   QString newId = sentenceModel->getRowIdString(current.row());
   qDebug("Entering row %d with id '%s'.", current.row(), qPrintable(newId));
   emit enteringSentence(newId);
-}
-
-void SentenceList::markCurrentDirty()
-{
-  QList<QModelIndex> selectedRow = sentenceView->selectionModel()->selectedRows();
-  
-  if(selectedRow.isEmpty()) {
-    qDebug("No sentences selected!");
-    return;
-  }
-  
-  int row = selectedRow.first().row();
-  qInfo("Marking row %d dirty", row);
-  sentenceModel->setDirty(row);
 }

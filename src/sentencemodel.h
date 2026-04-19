@@ -8,7 +8,6 @@
 struct CellData {
   QString id = "";
   QString sentence = "";
-  bool dirty = false;
 };
 
 class SentenceModel : public QAbstractTableModel
@@ -29,8 +28,6 @@ public:
   void setAllData(const QVector<CellData> &data);
   const QVector<CellData> &getAllData() const;
   const QString &getRowIdString(const qint64 &row) const;
-  void setDirty(const qint64 &row, const bool &dirty = true);
-  const bool &isDirty(const qint64 &row) const;
 
   //bool insertRows(int position, int rows, const QModelIndex &parent = QModelIndex());
   //bool insertColumns(int position, int columns, const QModelIndex &parent = QModelIndex());
