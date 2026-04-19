@@ -48,7 +48,7 @@ When you've spoken the sentence click the `Stop` button (same as the `Record` bu
 
 If this is your first session I would always recommend recording a few sentences and then opening up the `wav` subdirectory and play some of the wav files. Just to make sure everything is the way you want it to be. Check that the wav files have the correct samplerate and bitrate. Check that they play fine in any other audio playing software.
 
-Then continue to recording sentences until you have recorded all sentences from your CSV file. When you reach the end remember to celebrate! Recording sentences for TTS voice training is A LOT of work!
+Then continue recording sentences until you have recorded all sentences from your CSV file. When you reach the end remember to celebrate! Recording sentences for TTS voice training is A LOT of work! 😊
 
 ## F.A.Q
 ### Q: What is a piper-formatted CSV?
