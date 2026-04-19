@@ -29,11 +29,11 @@ SentenceList::SentenceList(QWidget *parent)
   connect(sentenceView->selectionModel(), &QItemSelectionModel::currentChanged, this, &SentenceList::selectionChanged);
   
   QPushButton *loadSentencesButton = new QPushButton(QIcon(":load.png"), tr("Load sentences..."), this);
-  loadSentencesButton->setIconSize(QSize(16, 16));
+  loadSentencesButton->setIconSize(QSize(32, 32));
   connect(loadSentencesButton, &QPushButton::clicked, this, &SentenceList::loadSentences);
 
-  QPushButton *deleteSentenceButton = new QPushButton(QIcon(":delete.png"), tr("Delete selected sentence"), this);
-  deleteSentenceButton->setIconSize(QSize(16, 16));
+  QPushButton *deleteSentenceButton = new QPushButton(QIcon(":delete.png"), tr("Delete sentence"), this);
+  deleteSentenceButton->setIconSize(QSize(32, 32));
   connect(deleteSentenceButton, &QPushButton::clicked, this, &SentenceList::deleteSentence);
 
   QVBoxLayout *buttonLayout = new QVBoxLayout();
@@ -174,7 +174,24 @@ void SentenceList::deleteSentence()
   }
   
   int row = selectedRow.first().row();
-  emit deleteFromDisk(sentenceModel->getRowIdString(row));
+  QString sentenceId = sentenceModel->getRowIdString(row);
+
+  bool doDelete = true;
+  if(settings.askDelete) {
+    QMessageBox::StandardButton button = QMessageBox::question(this, tr("Delete sentence?"),
+							       tr("Are you sure you want to delete sentence with id '") + sentenceId + tr("'? The corresponding wav file will also be deleted!"),
+							       QMessageBox::Yes | QMessageBox::No,
+							       QMessageBox::No);
+    if(button == QMessageBox::No) {
+      doDelete = false;
+    }
+  }
+
+  if(!doDelete) {
+    return;
+  }
+
+  emit deleteFromDisk(sentenceId);
   qInfo("Removing row %d", row);
   // This automatically calls removeRows (plural) in the selectionModel
   sentenceModel->removeRow(row);

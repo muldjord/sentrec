@@ -14,6 +14,9 @@ MainPage::MainPage(QSettings &settings, QWidget *parent) : QWidget(parent), sett
 
   ConfigCheckBox *csvBackupCheckBox = new ConfigCheckBox(settings, tr("Create CSV backup on load"), "main", "csvBackup", true);
   connect(resetButton, &QPushButton::clicked, csvBackupCheckBox, &ConfigCheckBox::resetToDefault);
+
+  ConfigCheckBox *askDeleteCheckBox = new ConfigCheckBox(settings, tr("Ask before deleting sentences"), "main", "askDelete", true);
+  connect(resetButton, &QPushButton::clicked, askDeleteCheckBox, &ConfigCheckBox::resetToDefault);
   /*
 
   ConfigCheckBox *diskLoggingCheckBox = new ConfigCheckBox(settings, tr("Enable disk logging in addition to GUI logging"), "main", "logToFile", false);
@@ -40,6 +43,7 @@ MainPage::MainPage(QSettings &settings, QWidget *parent) : QWidget(parent), sett
   QVBoxLayout *layout = new QVBoxLayout();
   layout->addWidget(resetButton);
   layout->addWidget(csvBackupCheckBox);
+  layout->addWidget(askDeleteCheckBox);
   /*
   layout->addWidget(diskLoggingCheckBox);
   layout->addWidget(logLevelComboBox);
