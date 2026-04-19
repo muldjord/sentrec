@@ -1,2 +1,9 @@
+[audio]
+autoFade=true
+autoNormalize=true
+autoTrim=true
+samplerate=44100
+
 [main]
-locale=da_DK
+askDelete=true
+csvBackup=true
