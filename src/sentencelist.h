@@ -18,10 +18,12 @@ public:
   SentenceList(QWidget *parent);
 
 public slots:
-  void setSentences(const QVector<QVector<QString> > &data);
+  void setSentences(const QVector<CellData> &data);
   void clearSentenceList();
+  void markCurrentDirty();
 
 signals:
+  void sentencesLoaded();
   void leavingSentence(const QString &sentenceId);
   void enteringSentence(const QString &sentenceId);
 

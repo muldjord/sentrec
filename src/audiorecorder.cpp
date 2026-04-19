@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QSettings>
 #include <QMediaDevices>
+#include <QMessageBox>
 #include <QAudioDevice>
 #include <QLabel>
 
@@ -71,7 +72,18 @@ AudioRecorder::~AudioRecorder()
 void AudioRecorder::loadFromDisk(const QString &id)
 {
   qInfo("Loading wav with id '%s' into audio recorder", qPrintable(id));
-  buffer = loadWav(settings.sentenceFileInfo.absolutePath() + "/wav/" + id + ".wav");
+  int wavSamplerate = 0;
+  QString wavFileString = settings.sentenceFileInfo.absolutePath() + "/wav/" + id + ".wav";
+  buffer = loadWav(wavFileString, &wavSamplerate);
+  if(settings.samplerate != wavSamplerate) {
+    QMessageBox::information(this, tr("Mismatched samplerate"),
+			     tr("Wav file: ") + wavFileString + "\n" +
+			     tr("Wav file samplerate: ") + QString::number(wavSamplerate) + "\n" +
+			     tr("SentRec samplerate: ") + QString::number(settings.samplerate) + "\n\n" +
+			     tr("The loaded wav file has a mismatched samplerate to what is currently configured int SentRec. The output will sound either sped up or slowed down. Consider either converting your wav files or configure the SentRec samplerate to match your wav files."),
+			     QMessageBox::Ok,
+			     QMessageBox::Ok);
+  }
   waveformWidget->setSamples(buffer);
 }
 
@@ -93,6 +105,7 @@ void AudioRecorder::startRecording()
   if(!audioSource) {
     return;
   }
+
   qInfo("Starting recording!");
   audioIn = audioSource->start();
 
@@ -114,6 +127,9 @@ void AudioRecorder::startRecording()
 
 void AudioRecorder::stopRecording()
 {
+  // Mark currently selected sentence dirty, so it will be saved to disk
+  emit markDirty();
+
   qDebug("Stopping recording!");
   if(audioIn) {
     audioIn->disconnect(this);

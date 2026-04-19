@@ -68,7 +68,7 @@ void SentenceList::loadSentences()
   settings.sentenceFileInfo = QFileInfo(sentenceFileString);
 
   QFile sentenceFile(settings.sentenceFileInfo.absoluteFilePath());
-  QVector<QVector<QString> > sentences;
+  QVector<CellData> sentences;
   if(sentenceFile.open(QIODevice::ReadOnly)) {
     QString backupFileString = sentenceFile.fileName() + ".bu" + QDateTime::currentDateTime().toString("yyyyMMdd-HHmmss");
     if(QFile::copy(sentenceFile.fileName(), backupFileString)) {
@@ -87,17 +87,21 @@ void SentenceList::loadSentences()
 	qWarning("Format error!\nLine: %llu, Data: '%s'\nExpected 2 columns / cells but got %llu, loading cancelled!", lineIdx, qPrintable(line), cells.count());
 	return;
       }
-      sentences.append(cells);
+      CellData cellData;
+      cellData.id = cells[0];
+      cellData.sentence = cells[1];
+      sentences.append(cellData);
       lineIdx++;
     }
     sentenceFile.close();
+    qDebug("Loaded %llu sentences, now setting data...", sentences.size());
     setSentences(sentences);
   } else {
     qWarning("Couldn't open sentence file '%s' for reading, can't load sentences...", qPrintable(sentenceFile.fileName()));
   }
 }
 
-void SentenceList::setSentences(const QVector<QVector<QString> > &data)
+void SentenceList::setSentences(const QVector<CellData> &data)
 {
   if(data.isEmpty()) {
     qInfo("No sentences found in data...");
@@ -123,14 +127,15 @@ void SentenceList::setSentences(const QVector<QVector<QString> > &data)
     wavIds.append(wavInfo.baseName());
   }
   for(int i = 0; i < sentenceModel->getAllData().size(); ++i) {
-    if(!wavIds.contains(sentenceModel->getAllData()[i][0])) {
-      qDebug("Selecting id %s", qPrintable(sentenceModel->getAllData()[i][0]));
+    if(!wavIds.contains(sentenceModel->getAllData()[i].id)) {
+      qDebug("Selecting id %s", qPrintable(sentenceModel->getAllData()[i].id));
       QModelIndex idx = sentenceModel->index(i, 0);
       sentenceView->selectionModel()->setCurrentIndex(idx, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
       sentenceView->scrollTo(idx);
       break;
     }
   }
+  emit sentencesLoaded();
 }
 
 void SentenceList::saveSentences()
@@ -140,18 +145,11 @@ void SentenceList::saveSentences()
   }
 
   qInfo("Saving all sentences back to '%s'...", qPrintable(settings.sentenceFileInfo.absoluteFilePath()));
-  const QVector<QVector<QString> > &tableData = sentenceModel->getAllData();
+  const QVector<CellData> &tableData = sentenceModel->getAllData();
   QFile sentenceFile(settings.sentenceFileInfo.absoluteFilePath());
   if(sentenceFile.open(QIODevice::WriteOnly)) {
     for(const auto &row: tableData) {
-      if(row.size() != 2) {
-	QMessageBox::critical(this, tr("Number of rows differ from 2!"),
-			      tr("The number of rows in the internal data structure differs from 2! Something is very wrong!"),
-			      QMessageBox::Ok);
-	qCritical("Number of rows != 2!!! Something is very wrong!");
-	return;
-      }
-      QString line = row[0] + "|" + row[1] + "\n";
+      QString line = row.id + "|" + row.sentence + "\n";
       sentenceFile.write(line.toUtf8());
     }
     sentenceFile.close();
@@ -179,19 +177,34 @@ void SentenceList::deleteSentence()
 
 void SentenceList::clearSentenceList()
 {
-  QVector<QVector<QString> > tempList;
+  QVector<CellData> tempList;
   setSentences(tempList);
 }
 
 void SentenceList::selectionChanged(const QModelIndex &current, const QModelIndex &previous)
 {
-  if(previous.isValid()) {
+  if(previous.isValid() && sentenceModel->isDirty(previous.row())) {
     QString oldId = sentenceModel->getRowIdString(previous.row());
     qDebug("Leaving row %d with id '%s'.", previous.row(), qPrintable(oldId));
     emit leavingSentence(oldId);
+    sentenceModel->setDirty(previous.row(), false);
   }
 
   QString newId = sentenceModel->getRowIdString(current.row());
   qDebug("Entering row %d with id '%s'.", current.row(), qPrintable(newId));
   emit enteringSentence(newId);
+}
+
+void SentenceList::markCurrentDirty()
+{
+  QList<QModelIndex> selectedRow = sentenceView->selectionModel()->selectedRows();
+  
+  if(selectedRow.isEmpty()) {
+    qDebug("No sentences selected!");
+    return;
+  }
+  
+  int row = selectedRow.first().row();
+  qInfo("Marking row %d dirty", row);
+  sentenceModel->setDirty(row);
 }

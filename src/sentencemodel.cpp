@@ -28,7 +28,7 @@ int SentenceModel::columnCount(const QModelIndex &) const
   if(tableData.isEmpty()) {
     return 0;
   }
-  return tableData[0].size();
+  return 2;
 }
 
 QVariant SentenceModel::data(const QModelIndex &index, int role) const
@@ -37,19 +37,25 @@ QVariant SentenceModel::data(const QModelIndex &index, int role) const
     return QVariant();
   }
 
+  int column = index.column();
+
   if(role == Qt::DisplayRole) {
-    return QVariant(tableData[index.row()][index.column()]);
+    if(column == SR::ID_COL) {
+      return QVariant(tableData[index.row()].id);
+    } else if(column == SR::SENTENCE_COL) {
+      return QVariant(tableData[index.row()].sentence);
+    }
   } else if(role == Qt::EditRole) {
     // Only allow edit if this is the sentence column
-    if(index.column() == SR::SENT_COL) {
-      return QVariant(tableData[index.row()][index.column()]);
+    if(column == SR::SENTENCE_COL) {
+      return QVariant(tableData[index.row()].sentence);
     }
   } else if(role == Qt::ForegroundRole) {
-    if(index.column() == SR::SENT_COL) {
+    if(column == SR::SENTENCE_COL) {
       return QVariant(QBrush(QColor(255, 255, 255)));
     }
   } else if(role == Qt::BackgroundRole) {
-    if(index.column() == SR::SENT_COL) {
+    if(column == SR::SENTENCE_COL) {
       return QVariant(QBrush(QColor(0, 0, 0)));
     }
   }
@@ -76,7 +82,9 @@ Qt::ItemFlags SentenceModel::flags(const QModelIndex &index) const
     return Qt::ItemIsEnabled;
   }
 
-  if(index.column() == SR::SENT_COL) {
+  int column = index.column();
+
+  if(column == SR::SENTENCE_COL) {
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
   }
 
@@ -87,11 +95,11 @@ bool SentenceModel::setData(const QModelIndex &index, const QVariant &value, int
 {
   if(!index.isValid() ||
      role != Qt::EditRole ||
-     index.column() != SR::SENT_COL) {
+     index.column() != SR::SENTENCE_COL) {
     return false;
   }
 
-  tableData[index.row()][index.column()] = value.toString();
+  tableData[index.row()].sentence = value.toString();
   mainWindow->setWindowModified(true);
   emit dataChanged(index, index); // Inform the model that this index has changed
   return true;
@@ -106,19 +114,29 @@ bool SentenceModel::removeRows(int row, int count, const QModelIndex &parent)
   return true;
 }
 
-void SentenceModel::setAllData(const QVector<QVector<QString> > &data)
+void SentenceModel::setAllData(const QVector<CellData> &data)
 {
   beginResetModel();
   tableData = data;
   endResetModel();
 }
 
-const QVector<QVector<QString> > &SentenceModel::getAllData() const
+const QVector<CellData> &SentenceModel::getAllData() const
 {
   return tableData;
 }
 
 const QString &SentenceModel::getRowIdString(const qint64 &row) const
 {
-  return tableData[row][0];
+  return tableData[row].id;
+}
+
+void SentenceModel::setDirty(const qint64 &row, const bool &dirty)
+{
+  tableData[row].dirty = dirty;
+}
+
+const bool &SentenceModel::isDirty(const qint64 &row) const
+{
+  return tableData[row].dirty;
 }

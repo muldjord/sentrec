@@ -93,8 +93,12 @@ void MainWindow::createMainLayout()
   setCentralWidget(new QWidget(this));
 
   sentenceList = new SentenceList(this);
+  
   audioRecorder = new AudioRecorder(this);
+  connect(audioRecorder, &AudioRecorder::markDirty, sentenceList, &SentenceList::markCurrentDirty);
+  audioRecorder->setEnabled(false);
 
+  connect(sentenceList, &SentenceList::sentencesLoaded, this, [this]() { audioRecorder->setEnabled(true); });
   connect(sentenceList, &SentenceList::leavingSentence, audioRecorder, &AudioRecorder::saveToDisk);
   connect(sentenceList, &SentenceList::enteringSentence, audioRecorder, &AudioRecorder::loadFromDisk);
 
