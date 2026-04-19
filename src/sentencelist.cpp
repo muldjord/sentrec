@@ -197,7 +197,17 @@ void SentenceList::selectionChanged(const QModelIndex &current, const QModelInde
   emit enteringSentence(newId);
 }
 
+void SentenceList::selectPreviousSentence()
+{
+  sentenceAdvance(-1);
+}
+
 void SentenceList::selectNextSentence()
+{
+  sentenceAdvance(1);
+}
+
+void SentenceList::sentenceAdvance(const int &delta)
 {
   QList<QModelIndex> selectedRow = sentenceView->selectionModel()->selectedRows();
 
@@ -208,12 +218,14 @@ void SentenceList::selectNextSentence()
   int currentRow = selectedRow[0].row();
   
   // Check if out of bounds
-  if(currentRow + 1 > sentenceModel->rowCount() - 1) {
-    qDebug("Last row already selected, ignoring sentence change!");
+  if(currentRow + delta > sentenceModel->rowCount() - 1 ||
+     currentRow + delta < 0) {
+    qDebug("Sentence advance out of bounds, ignoring sentence change!");
     return;
   }
 
-  QModelIndex idx = sentenceModel->index(currentRow + 1, 0);
+  QModelIndex idx = sentenceModel->index(currentRow + delta, 0);
   sentenceView->selectionModel()->setCurrentIndex(idx, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
   sentenceView->scrollTo(idx);
+
 }

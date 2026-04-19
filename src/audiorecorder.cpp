@@ -35,9 +35,11 @@ AudioRecorder::AudioRecorder(QWidget *parent)
   
   waveformWidget = new WaveformWidget;
   recordButton = new QPushButton(tr("Record"));
-  stopButton = new QPushButton(tr("Stop"));
+  recordButton->setCheckable(true);
+  //stopButton = new QPushButton(tr("Stop"));
   playButton = new QPushButton(tr("Play"));
-  nextButton = new QPushButton(tr("Record next"));
+  prevButton = new QPushButton(tr("<< Previous"));
+  nextButton = new QPushButton(tr("Next >>"));
 
   auto deviceLayout = new QHBoxLayout;
   deviceLayout->addWidget(deviceLabel);
@@ -47,8 +49,9 @@ AudioRecorder::AudioRecorder(QWidget *parent)
   deviceLayout->addStretch(1);
 
   auto buttonLayout = new QHBoxLayout;
+  buttonLayout->addWidget(prevButton);
   buttonLayout->addWidget(recordButton);
-  buttonLayout->addWidget(stopButton);
+  //buttonLayout->addWidget(stopButton);
   buttonLayout->addWidget(playButton);
   buttonLayout->addWidget(nextButton);
 
@@ -57,10 +60,11 @@ AudioRecorder::AudioRecorder(QWidget *parent)
   vLayout->addWidget(waveformWidget);
   vLayout->addLayout(buttonLayout);
 
-  connect(recordButton, &QPushButton::clicked, this, &AudioRecorder::startRecording);
-  connect(stopButton, &QPushButton::clicked, this, &AudioRecorder::stopRecording);
+  connect(recordButton, &QPushButton::released, this, &AudioRecorder::toggleRecording);
+  //connect(stopButton, &QPushButton::clicked, this, &AudioRecorder::stopRecording);
   connect(playButton, &QPushButton::clicked, this, &AudioRecorder::playRecording);
-  connect(nextButton, &QPushButton::clicked, this, &AudioRecorder::nextRecording);
+  connect(prevButton, &QPushButton::clicked, this, [this]() { emit selectPreviousSentence(); });
+  connect(nextButton, &QPushButton::clicked, this, [this]() { emit selectNextSentence(); });
 
   setLayout(vLayout);
 }
@@ -103,6 +107,25 @@ bool AudioRecorder::saveToDisk(const QString &id)
     return true;
   }
   return false;
+}
+
+void AudioRecorder::toggleRecording()
+{
+  if(recordButton->isChecked()) {
+    if(settings.currentSentenceId.isEmpty()) {
+      recordButton->setChecked(false);
+      return;
+    }
+    startRecording();
+    recordButton->setText(tr("Stop"));
+    playButton->setEnabled(false);
+    nextButton->setEnabled(false);
+  } else {
+    stopRecording();
+    recordButton->setText(tr("Record"));
+    playButton->setEnabled(true);
+    nextButton->setEnabled(true);
+  }
 }
 
 void AudioRecorder::startRecording()
@@ -170,19 +193,6 @@ void AudioRecorder::playRecording()
     qsizetype byteCount = buffer.size() * sizeof(float);
     audioOut->write(dataPtr, byteCount);
   }
-}
-
-void AudioRecorder::nextRecording()
-{
-  stopRecording();
-  qDebug("Moving to next sentence!");
-  emit selectNextSentence();
-  startRecording();
-  /*
-  if(audioIn) {
-    audioIn->disconnect(this);
-  }
-  */
 }
 
 void AudioRecorder::inputDeviceChanged(int index)

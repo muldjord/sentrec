@@ -96,6 +96,7 @@ void MainWindow::createMainLayout()
   
   audioRecorder = new AudioRecorder(this);
   audioRecorder->setEnabled(false);
+  connect(audioRecorder, &AudioRecorder::selectPreviousSentence, sentenceList, &SentenceList::selectPreviousSentence);
   connect(audioRecorder, &AudioRecorder::selectNextSentence, sentenceList, &SentenceList::selectNextSentence);
 
   connect(sentenceList, &SentenceList::sentencesLoaded, this, [this]() { audioRecorder->setEnabled(true); });

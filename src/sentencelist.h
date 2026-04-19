@@ -20,6 +20,7 @@ public:
 public slots:
   void setSentences(const QVector<CellData> &data);
   void clearSentenceList();
+  void selectPreviousSentence();
   void selectNextSentence();
 
 signals:
@@ -33,6 +34,7 @@ private slots:
   void selectionChanged(const QModelIndex &current, const QModelIndex &previous);
 
 private:
+  void sentenceAdvance(const int &delta);
   SentenceModel *sentenceModel = nullptr;
   QTableView *sentenceView;
 

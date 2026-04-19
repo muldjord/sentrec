@@ -24,14 +24,15 @@ public slots:
 		  
 signals:
   void selectNextSentence();
+  void selectPreviousSentence();
 
 private slots:
   void inputDeviceChanged(int index);
   void samplerateChanged(int index);
+  void toggleRecording();
   void startRecording();
   void stopRecording(); 
   void playRecording();
-  void nextRecording();
 
 private:
   void setInputDevice();
@@ -43,8 +44,9 @@ private:
   WaveformWidget *waveformWidget = nullptr;
 
   QPushButton *recordButton = nullptr;
-  QPushButton *stopButton = nullptr;
+  //QPushButton *stopButton = nullptr;
   QPushButton *playButton = nullptr;
+  QPushButton *prevButton = nullptr;
   QPushButton *nextButton = nullptr;
   
   QAudioSource *audioSource = nullptr;
