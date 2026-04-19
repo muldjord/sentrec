@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(SentRec VERSION 0.0.1 LANGUAGES CXX)
+project(SentRec VERSION 0.7.3 LANGUAGES CXX)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/version.h.in ${CMAKE_CURRENT_BINARY_DIR}/version.h)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
