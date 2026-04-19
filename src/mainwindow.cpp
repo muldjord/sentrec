@@ -10,6 +10,7 @@
 #include <QMenuBar>
 #include <QStatusBar>
 #include <QMessageBox>
+#include <QMediaDevices>
 
 QMainWindow *mainWindow = nullptr;
 
@@ -27,10 +28,13 @@ MainWindow::MainWindow()
                  .arg(PROJECT_VERSION_PATCH)
                  + "[*]");
 
+  updateFromConfig();
+
   createActions();
   createMenus();
   //createToolBar();
   createMainLayout();
+
 }
 
 MainWindow::~MainWindow()
@@ -113,6 +117,25 @@ void MainWindow::showPreferences()
 {
   ConfigDialog preferences(*iniSettings);
   preferences.exec();
+
+  updateFromConfig();
+}
+
+void MainWindow::updateFromConfig()
+{
+  // Update internal config to match ini settings
+  QByteArray deviceId = iniSettings->value("audio/inputDeviceId", "").toByteArray();
+  for(const auto &device: QMediaDevices::audioInputs()) {
+    if(deviceId == device.id()) {
+      settings.inputDevice = device;
+      break;
+    }
+  }
+  settings.samplerate = iniSettings->value("audio/samplerate", 44100).toInt();
+
+  settings.autoTrim = iniSettings->value("audio/autoTrim", true).toBool();
+  settings.autoNormalize = iniSettings->value("audio/autoNormalize", true).toBool();
+  settings.autoFade = iniSettings->value("audio/autoFade", true).toBool();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

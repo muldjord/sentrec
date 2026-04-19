@@ -4,36 +4,33 @@
 #include "settings.h"
 
 #include <QDebug>
+#include <QSettings>
 #include <QMediaDevices>
 #include <QAudioDevice>
 #include <QLabel>
 
+extern QSettings *iniSettings;
 extern Settings settings;
 
 AudioRecorder::AudioRecorder(QWidget *parent)
   : QWidget(parent)
 {
-  QAudioDevice inputDevice = QMediaDevices::defaultAudioInput();
-  qInfo("Default device description is: %s", qPrintable(inputDevice.description()));
-  qInfo("Default device id is: %s", qPrintable(inputDevice.id()));
-  QAudioDevice outputDevice = QMediaDevices::defaultAudioOutput();
-  
-  QAudioFormat format;
-  format.setSampleRate(settings.sampleRate);
-  format.setChannelCount(1);
-  format.setSampleFormat(QAudioFormat::Float);
-  
-  audioSink = new QAudioSink(outputDevice, format, this);
+  setOutputDevice();
+ 
+  QLabel *samplerateLabel = new QLabel(tr("Samplerate:"));
+  samplerateCombo = new QComboBox;
+  connect(samplerateCombo, &QComboBox::activated, this, &AudioRecorder::samplerateChanged);
 
   QLabel *deviceLabel = new QLabel(tr("Input device:"));
   deviceCombo = new QComboBox;
+  connect(deviceCombo, &QComboBox::activated, this, &AudioRecorder::inputDeviceChanged);
   for(const auto &device: QMediaDevices::audioInputs()) {
     deviceCombo->addItem(device.description(), device.id());
-    if(inputDevice.id() == device.id()) {
+    if(settings.inputDevice.id() == device.id()) {
       deviceCombo->setCurrentIndex(deviceCombo->count() - 1);
     }
   }
-  connect(deviceCombo, &QComboBox::currentIndexChanged, this, &AudioRecorder::deviceChanged);
+  inputDeviceChanged(deviceCombo->currentIndex());
   
   waveformWidget = new WaveformWidget;
   recordButton = new QPushButton(tr("Record"));
@@ -44,6 +41,8 @@ AudioRecorder::AudioRecorder(QWidget *parent)
   auto deviceLayout = new QHBoxLayout;
   deviceLayout->addWidget(deviceLabel);
   deviceLayout->addWidget(deviceCombo);
+  deviceLayout->addWidget(samplerateLabel);
+  deviceLayout->addWidget(samplerateCombo);
   deviceLayout->addStretch(1);
 
   auto buttonLayout = new QHBoxLayout;
@@ -79,11 +78,11 @@ void AudioRecorder::loadFromDisk(const QString &id)
 bool AudioRecorder::saveToDisk(const QString &id)
 {
   if(buffer.isEmpty()) {
-    qDebug("Should I save to disk? No, buffer is empty, ignoring.");
+    qDebug("Buffer is empty, not saving to disk.");
     return true;
   }
   qInfo("Saving wav to disk with id '%s'", qPrintable(id));
-  if(saveWav(settings.sentenceFileInfo.absolutePath() + "/wav/" + id + ".wav", buffer, settings.sampleRate)) {
+  if(saveWav(settings.sentenceFileInfo.absolutePath() + "/wav/" + id + ".wav", buffer, settings.samplerate)) {
     return true;
   }
   return false;
@@ -134,7 +133,6 @@ void AudioRecorder::playRecording()
   if(audioSink && audioSink->state() == QAudio::ActiveState) {
     return;
   }
-
   audioOut = audioSink->start();
   if(audioOut) {
     const char* dataPtr = reinterpret_cast<const char*>(buffer.constData());
@@ -153,21 +151,79 @@ void AudioRecorder::nextRecording()
   */
 }
 
-void AudioRecorder::deviceChanged(int index)
+void AudioRecorder::inputDeviceChanged(int index)
 {
-  QAudioFormat format;
-  format.setSampleRate(settings.sampleRate);
-  format.setChannelCount(1);
-  format.setSampleFormat(QAudioFormat::Float);
-
   QByteArray deviceId = deviceCombo->itemData(index).toByteArray();
+  iniSettings->setValue("audio/inputDeviceId", deviceId);
 
   for(const auto &device: QMediaDevices::audioInputs()) {
     if(deviceId == device.id()) {
-      delete audioSource;
-      audioSource = new QAudioSource(device, format, this);
-      qInfo("Switched device to '%s'", qPrintable(deviceId));
+      settings.inputDevice = device;
       break;
     }
   }
+
+  samplerateCombo->clear();
+
+  QList<int> samplerates;
+  samplerates.append(22050);
+  samplerates.append(44100);
+  samplerates.append(48000);
+
+  int minSamplerate = settings.inputDevice.minimumSampleRate();
+  int maxSamplerate = settings.inputDevice.maximumSampleRate();
+
+  for(const auto &samplerate: samplerates) {
+    if(samplerate >= minSamplerate && samplerate <= maxSamplerate) {
+      samplerateCombo->addItem(QString::number(samplerate), samplerate);
+      if(samplerate == settings.samplerate) {
+	// This also runs samplerateChanged which in turn initiates the new input device
+	samplerateCombo->setCurrentIndex(samplerateCombo->count() - 1);
+      }
+    }
+  }
+  samplerateChanged(samplerateCombo->currentIndex());
+}
+
+void AudioRecorder::samplerateChanged(int index)
+{
+  int samplerate = samplerateCombo->itemData(index).toInt();
+  iniSettings->setValue("audio/samplerate", samplerate);
+  settings.samplerate = samplerate;
+
+  setInputDevice();
+}
+
+void AudioRecorder::setInputDevice()
+{
+  QAudioFormat format;
+  format.setSampleRate(settings.samplerate);
+  format.setChannelCount(1);
+  format.setSampleFormat(QAudioFormat::Float);
+
+  if(audioSource) {
+    audioSource->stop();
+    delete audioSource;
+  }
+  audioSource = new QAudioSource(settings.inputDevice, format, this);
+
+  qInfo("Set input device to: '%s'", qPrintable(settings.inputDevice.id()));
+}
+
+void AudioRecorder::setOutputDevice()
+{
+  QAudioDevice device = QMediaDevices::defaultAudioOutput();
+  
+  QAudioFormat format;
+  format.setSampleRate(settings.samplerate);
+  format.setChannelCount(1);
+  format.setSampleFormat(QAudioFormat::Float);
+  
+  if(audioSink) {
+    audioSink->stop();
+    delete audioSink;
+  }
+  audioSink = new QAudioSink(device, format, this);
+
+  qInfo("Set output device to: '%s'", qPrintable(device.id()));
 }

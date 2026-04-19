@@ -8,7 +8,7 @@ extern Settings settings;
 
 QVector<float> AudioProcessor::cutSilence(const QVector<float> &samples)
 {
-  int smpsPerMs = round(settings.sampleRate / 1000.0);
+  int smpsPerMs = round(settings.samplerate / 1000.0);
   int padding = 100 * smpsPerMs; // 100 ms padding at beginning and end after removing silence
 
   // First non-silence detection from left BEGIN
@@ -96,7 +96,7 @@ QVector<float> AudioProcessor::normalize(const QVector<float> &samples)
 
 QVector<float> AudioProcessor::fadeEnds(const QVector<float> &samples)
 {
-  int smpsPerMs = round(settings.sampleRate / 1000.0);
+  int smpsPerMs = round(settings.samplerate / 1000.0);
   int fadeLen = 20 * smpsPerMs; // 20 ms fade applied at beginning and end after adding padding
   
   QVector<float> withFades = samples;

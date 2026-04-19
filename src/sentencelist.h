@@ -28,7 +28,7 @@ signals:
 private slots:
   void loadSentences();
   void saveSentences();
-  void removeSentence();
+  void deleteSentence();
   void selectionChanged(const QModelIndex &current, const QModelIndex &previous);
 
 private:

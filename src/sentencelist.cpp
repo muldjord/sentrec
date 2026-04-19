@@ -28,13 +28,13 @@ SentenceList::SentenceList(QWidget *parent)
   // When the sentence selection changes
   connect(sentenceView->selectionModel(), &QItemSelectionModel::currentChanged, this, &SentenceList::selectionChanged);
   
-  QPushButton *loadSentencesButton = new QPushButton(QIcon(":remove.png"), tr("Load sentences..."), this);
+  QPushButton *loadSentencesButton = new QPushButton(QIcon(":load.png"), tr("Load sentences..."), this);
   loadSentencesButton->setIconSize(QSize(16, 16));
   connect(loadSentencesButton, &QPushButton::clicked, this, &SentenceList::loadSentences);
 
-  QPushButton *deleteSentenceButton = new QPushButton(QIcon(":remove.png"), tr("Delete selected sentence"), this);
+  QPushButton *deleteSentenceButton = new QPushButton(QIcon(":delete.png"), tr("Delete selected sentence"), this);
   deleteSentenceButton->setIconSize(QSize(16, 16));
-  connect(deleteSentenceButton, &QPushButton::clicked, this, &SentenceList::removeSentence);
+  connect(deleteSentenceButton, &QPushButton::clicked, this, &SentenceList::deleteSentence);
 
   QVBoxLayout *buttonLayout = new QVBoxLayout();
   buttonLayout->addWidget(loadSentencesButton);
@@ -160,7 +160,7 @@ void SentenceList::saveSentences()
   }
 }
 
-void SentenceList::removeSentence()
+void SentenceList::deleteSentence()
 {
   QList<QModelIndex> selectedRow = sentenceView->selectionModel()->selectedRows();
   

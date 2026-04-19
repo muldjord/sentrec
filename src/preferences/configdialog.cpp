@@ -13,9 +13,11 @@ ConfigDialog::ConfigDialog(QSettings &settings)
   contentsWidget->setSpacing(12);
 
   mainPage = new MainPage(settings);
+  audioPage = new AudioPage(settings);
 
   pagesWidget = new QStackedWidget;
   pagesWidget->addWidget(mainPage);
+  pagesWidget->addWidget(audioPage);
 
   QPushButton *okButton = new QPushButton(tr("Ok"));
   okButton->setDefault(true);
@@ -49,6 +51,12 @@ void ConfigDialog::createIcons()
   mainButton->setTextAlignment(Qt::AlignHCenter);
   mainButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
+  QListWidgetItem *audioButton = new QListWidgetItem(contentsWidget);
+  audioButton->setIcon(QIcon(":generalconfig.png"));
+  audioButton->setText(tr("Audio"));
+  audioButton->setTextAlignment(Qt::AlignHCenter);
+  audioButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+  
   connect(contentsWidget, &QListWidget::currentItemChanged, this, &ConfigDialog::changePage);
 }
 

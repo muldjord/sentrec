@@ -23,15 +23,22 @@ public slots:
   bool saveToDisk(const QString &id);
 		  
 private slots:
-  void deviceChanged(int index);
+  void inputDeviceChanged(int index);
+  void samplerateChanged(int index);
   void startRecording();
   void stopRecording(); 
   void playRecording();
   void nextRecording();
 
 private:
+  void setInputDevice();
+  void setOutputDevice();
+
   QComboBox *deviceCombo = nullptr;
+  QComboBox *samplerateCombo = nullptr;
+
   WaveformWidget *waveformWidget = nullptr;
+
   QPushButton *recordButton = nullptr;
   QPushButton *stopButton = nullptr;
   QPushButton *playButton = nullptr;

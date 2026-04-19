@@ -32,6 +32,7 @@ private:
   void createActions();
   void createToolBar();
   void createMainLayout();
+  void updateFromConfig();
 
   QMenuBar *menuBar;
   QMenu *fileMenu;

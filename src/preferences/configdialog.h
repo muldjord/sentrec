@@ -23,5 +23,6 @@ private:
   QListWidget *contentsWidget;
   QStackedWidget *pagesWidget;
   MainPage *mainPage;
+  AudioPage *audioPage;
   
 };

@@ -48,3 +48,26 @@ MainPage::MainPage(QSettings &settings, QWidget *parent) : QWidget(parent), sett
 
   setLayout(layout);
 }
+
+AudioPage::AudioPage(QSettings &settings, QWidget *parent) : QWidget(parent), settings(settings)
+{
+  QPushButton *resetButton = new QPushButton(tr("Reset all to defaults"));
+
+  ConfigCheckBox *autoNormalizeCheckBox = new ConfigCheckBox(settings, tr("Normalize audio after recording"), "audio", "autoNormalize", true);
+  connect(resetButton, &QPushButton::clicked, autoNormalizeCheckBox, &ConfigCheckBox::resetToDefault);
+
+  ConfigCheckBox *autoTrimCheckBox = new ConfigCheckBox(settings, tr("Trim audio after recording"), "audio", "autoTrim", true);
+  connect(resetButton, &QPushButton::clicked, autoTrimCheckBox, &ConfigCheckBox::resetToDefault);
+
+  ConfigCheckBox *autoFadeCheckBox = new ConfigCheckBox(settings, tr("Apply fade-in/out after recording"), "audio", "autoFade", true);
+  connect(resetButton, &QPushButton::clicked, autoFadeCheckBox, &ConfigCheckBox::resetToDefault);
+
+  QVBoxLayout *layout = new QVBoxLayout();
+  layout->addWidget(resetButton);
+  layout->addWidget(autoNormalizeCheckBox);
+  layout->addWidget(autoTrimCheckBox);
+  layout->addWidget(autoFadeCheckBox);
+  layout->addStretch();
+
+  setLayout(layout);
+}
