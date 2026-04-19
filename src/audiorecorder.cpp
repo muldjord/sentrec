@@ -15,7 +15,7 @@ extern Settings settings;
 AudioRecorder::AudioRecorder(QWidget *parent)
   : QWidget(parent)
 {
-  setOutputDevice();
+  settings.outputDevice = QMediaDevices::defaultAudioOutput();
  
   QLabel *samplerateLabel = new QLabel(tr("Samplerate:"));
   samplerateCombo = new QComboBox;
@@ -118,9 +118,15 @@ void AudioRecorder::stopRecording()
   if(audioIn) {
     audioIn->disconnect(this);
   }
-  buffer = AudioProcessor::cutSilence(buffer);
-  buffer = AudioProcessor::normalize(buffer);
-  buffer = AudioProcessor::fadeEnds(buffer);
+  if(settings.autoTrim) {
+    buffer = AudioProcessor::cutSilence(buffer);
+  }
+  if(settings.autoNormalize) {
+    buffer = AudioProcessor::normalize(buffer);
+  }
+  if(settings.autoFade) {
+    buffer = AudioProcessor::fadeEnds(buffer);
+  }
   
   waveformWidget->setSamples(buffer);
 }
@@ -192,6 +198,7 @@ void AudioRecorder::samplerateChanged(int index)
   settings.samplerate = samplerate;
 
   setInputDevice();
+  setOutputDevice();
 }
 
 void AudioRecorder::setInputDevice()
@@ -212,8 +219,6 @@ void AudioRecorder::setInputDevice()
 
 void AudioRecorder::setOutputDevice()
 {
-  QAudioDevice device = QMediaDevices::defaultAudioOutput();
-  
   QAudioFormat format;
   format.setSampleRate(settings.samplerate);
   format.setChannelCount(1);
@@ -223,7 +228,7 @@ void AudioRecorder::setOutputDevice()
     audioSink->stop();
     delete audioSink;
   }
-  audioSink = new QAudioSink(device, format, this);
+  audioSink = new QAudioSink(settings.outputDevice, format, this);
 
-  qInfo("Set output device to: '%s'", qPrintable(device.id()));
+  qInfo("Set output device to: '%s'", qPrintable(settings.outputDevice.id()));
 }
