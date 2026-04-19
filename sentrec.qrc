@@ -6,6 +6,8 @@
     <file alias="about.png">icons/about.png</file>
     <file alias="icon.png">icons/icon.png</file>
     <file alias="preferences.png">icons/preferences.png</file>
+    <file alias="general.png">icons/general.png</file>
+    <file alias="audio.png">icons/audio.png</file>
     <file alias="quit.png">icons/quit.png</file>
     <file alias="load.png">icons/load.png</file>
     <file alias="delete.png">icons/delete.png</file>
