@@ -70,12 +70,18 @@ void SentenceList::loadSentences()
   QFile sentenceFile(settings.sentenceFileInfo.absoluteFilePath());
   QVector<CellData> sentences;
   if(sentenceFile.open(QIODevice::ReadOnly)) {
-    QString backupFileString = sentenceFile.fileName() + ".bu" + QDateTime::currentDateTime().toString("yyyyMMdd-HHmmss");
-    if(QFile::copy(sentenceFile.fileName(), backupFileString)) {
-      qInfo("Created sentence backup file '%s'...", qPrintable(backupFileString));
-    } else {
-      qCritical("Couldn't create backup file '%s', sentence loading cancelled!", qPrintable(backupFileString));
-      return;
+    if(settings.csvBackup) {
+      QString backupFileString = sentenceFile.fileName() + ".bu" + QDateTime::currentDateTime().toString("yyyyMMdd-HHmmss");
+      if(QFile::copy(sentenceFile.fileName(), backupFileString)) {
+	qInfo("Created sentence backup file '%s'...", qPrintable(backupFileString));
+      } else {
+	qCritical("Couldn't create CSV backup file '%s', sentence loading cancelled!", qPrintable(backupFileString));
+	QMessageBox::critical(this, tr("Couldn't create backup!"),
+			      tr("CSV backup is enabled but backup file '") + backupFileString + tr("' could not be created!\n\nSentence loading cancelled!"),
+			      QMessageBox::Ok,
+			      QMessageBox::Ok);
+	return;
+      }
     }
 
     qInfo("Loading sentences, please wait...");

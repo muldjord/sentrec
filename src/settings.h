@@ -6,7 +6,8 @@
 struct Settings {
   QFileInfo sentenceFileInfo;
   QString currentSentenceId = "";
-
+  bool csvBackup = true;
+  
   // Audio configs
   QAudioDevice inputDevice;
   QAudioDevice outputDevice;

@@ -129,6 +129,8 @@ void MainWindow::showPreferences()
 void MainWindow::updateFromConfig()
 {
   // Update internal config to match ini settings
+  settings.csvBackup = iniSettings->value("main/csvBackup", true).toBool();
+
   QByteArray deviceId = iniSettings->value("audio/inputDeviceId", "").toByteArray();
   for(const auto &device: QMediaDevices::audioInputs()) {
     if(deviceId == device.id()) {
@@ -137,7 +139,6 @@ void MainWindow::updateFromConfig()
     }
   }
   settings.samplerate = iniSettings->value("audio/samplerate", 44100).toInt();
-
   settings.autoTrim = iniSettings->value("audio/autoTrim", true).toBool();
   settings.autoNormalize = iniSettings->value("audio/autoNormalize", true).toBool();
   settings.autoFade = iniSettings->value("audio/autoFade", true).toBool();

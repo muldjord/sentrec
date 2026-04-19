@@ -12,8 +12,9 @@ MainPage::MainPage(QSettings &settings, QWidget *parent) : QWidget(parent), sett
 {
   QPushButton *resetButton = new QPushButton(tr("Reset all to defaults"));
 
-  ConfigCheckBox *showQueuePanelCheckBox = new ConfigCheckBox(settings, tr("Show queue panel on startup"), "main", "showQueuePanel", true);
-  connect(resetButton, &QPushButton::clicked, showQueuePanelCheckBox, &ConfigCheckBox::resetToDefault);
+  ConfigCheckBox *csvBackupCheckBox = new ConfigCheckBox(settings, tr("Create CSV backup on load"), "main", "csvBackup", true);
+  connect(resetButton, &QPushButton::clicked, csvBackupCheckBox, &ConfigCheckBox::resetToDefault);
+  /*
 
   ConfigCheckBox *diskLoggingCheckBox = new ConfigCheckBox(settings, tr("Enable disk logging in addition to GUI logging"), "main", "logToFile", false);
   connect(resetButton, &QPushButton::clicked, diskLoggingCheckBox, &ConfigCheckBox::resetToDefault);
@@ -35,15 +36,17 @@ MainPage::MainPage(QSettings &settings, QWidget *parent) : QWidget(parent), sett
                                                     5, 120,
                                                     tr("Minutes of inactivity before user logout (restart required):"), tr("minutes"), true);
   connect(resetButton, &QPushButton::clicked, inactivitySlider, &ConfigSlider::resetToDefault);
-
+  */
   QVBoxLayout *layout = new QVBoxLayout();
   layout->addWidget(resetButton);
-  layout->addWidget(showQueuePanelCheckBox);
+  layout->addWidget(csvBackupCheckBox);
+  /*
   layout->addWidget(diskLoggingCheckBox);
   layout->addWidget(logLevelComboBox);
   layout->addWidget(logFolderPathEdit);
   layout->addWidget(userConfigsCheckBox);
   layout->addWidget(inactivitySlider);
+  */
   layout->addStretch();
 
   setLayout(layout);
