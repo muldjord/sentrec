@@ -9,7 +9,7 @@ ConfigDialog::ConfigDialog(QSettings &settings)
   contentsWidget->setViewMode(QListView::IconMode);
   contentsWidget->setIconSize(QSize(64, 64));
   contentsWidget->setMovement(QListView::Static);
-  contentsWidget->setMaximumWidth(128);
+  contentsWidget->setMaximumWidth(98);
   contentsWidget->setSpacing(12);
 
   mainPage = new MainPage(settings);
@@ -46,13 +46,13 @@ ConfigDialog::ConfigDialog(QSettings &settings)
 void ConfigDialog::createIcons()
 {
   QListWidgetItem *mainButton = new QListWidgetItem(contentsWidget);
-  mainButton->setIcon(QIcon(":generalconfig.png"));
+  mainButton->setIcon(QIcon(":general.png"));
   mainButton->setText(tr("General"));
   mainButton->setTextAlignment(Qt::AlignHCenter);
   mainButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
   QListWidgetItem *audioButton = new QListWidgetItem(contentsWidget);
-  audioButton->setIcon(QIcon(":generalconfig.png"));
+  audioButton->setIcon(QIcon(":audio.png"));
   audioButton->setText(tr("Audio"));
   audioButton->setTextAlignment(Qt::AlignHCenter);
   audioButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);

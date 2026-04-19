@@ -63,7 +63,7 @@ AudioPage::AudioPage(QSettings &settings, QWidget *parent) : QWidget(parent), se
   ConfigCheckBox *autoNormalizeCheckBox = new ConfigCheckBox(settings, tr("Normalize audio after recording"), "audio", "autoNormalize", true);
   connect(resetButton, &QPushButton::clicked, autoNormalizeCheckBox, &ConfigCheckBox::resetToDefault);
 
-  ConfigCheckBox *autoTrimCheckBox = new ConfigCheckBox(settings, tr("Trim audio after recording"), "audio", "autoTrim", true);
+  ConfigCheckBox *autoTrimCheckBox = new ConfigCheckBox(settings, tr("Trim silence from beginning and end after recording"), "audio", "autoTrim", true);
   connect(resetButton, &QPushButton::clicked, autoTrimCheckBox, &ConfigCheckBox::resetToDefault);
 
   ConfigCheckBox *autoFadeCheckBox = new ConfigCheckBox(settings, tr("Apply fade-in/out after recording"), "audio", "autoFade", true);
