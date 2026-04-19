@@ -20,7 +20,7 @@ public:
 
 public slots:
   void loadFromDisk(const QString &id);
-  bool saveToDisk(const QString &id);
+  void deleteFromDisk(const QString &id);
 		  
 signals:
   void selectNextSentence();
@@ -35,6 +35,8 @@ private slots:
   void playRecording();
 
 private:
+  bool saveToDisk(const QString &id);
+
   void setInputDevice();
   void setOutputDevice();
 

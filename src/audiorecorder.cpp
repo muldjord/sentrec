@@ -109,6 +109,15 @@ bool AudioRecorder::saveToDisk(const QString &id)
   return false;
 }
 
+void AudioRecorder::deleteFromDisk(const QString &id)
+{
+  QString wavFileString = settings.sentenceFileInfo.absolutePath() + "/wav/" + id + ".wav";
+  if(QFileInfo::exists(wavFileString)) {
+    qInfo("Deleting wav with id '%s' from disk", qPrintable(id));
+    QFile::remove(wavFileString);
+  }
+}
+
 void AudioRecorder::toggleRecording()
 {
   if(recordButton->isChecked()) {
