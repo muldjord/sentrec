@@ -7,5 +7,12 @@
     <file alias="icon.png">icons/icon.png</file>
     <file alias="preferences.png">icons/preferences.png</file>
     <file alias="quit.png">icons/quit.png</file>
+    <file alias="load.png">icons/load.png</file>
+    <file alias="delete.png">icons/delete.png</file>
+    <file alias="previous.png">icons/previous.png</file>
+    <file alias="record.png">icons/record.png</file>
+    <file alias="stop.png">icons/stop.png</file>
+    <file alias="play.png">icons/play.png</file>
+    <file alias="next.png">icons/next.png</file>
   </qresource>
 </RCC>
