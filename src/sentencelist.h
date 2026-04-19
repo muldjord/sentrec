@@ -20,6 +20,7 @@ public:
 public slots:
   void setSentences(const QVector<CellData> &data);
   void clearSentenceList();
+  void selectNextSentence();
 
 signals:
   void sentencesLoaded();

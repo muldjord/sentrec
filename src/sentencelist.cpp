@@ -196,3 +196,24 @@ void SentenceList::selectionChanged(const QModelIndex &current, const QModelInde
   qDebug("Entering row %d with id '%s'.", current.row(), qPrintable(newId));
   emit enteringSentence(newId);
 }
+
+void SentenceList::selectNextSentence()
+{
+  QList<QModelIndex> selectedRow = sentenceView->selectionModel()->selectedRows();
+
+  if(selectedRow.isEmpty()) {
+    qInfo("No sentences selected, can't select next sentence!");
+    return;
+  }
+  int currentRow = selectedRow[0].row();
+  
+  // Check if out of bounds
+  if(currentRow + 1 > sentenceModel->rowCount() - 1) {
+    qDebug("Last row already selected, ignoring sentence change!");
+    return;
+  }
+
+  QModelIndex idx = sentenceModel->index(currentRow + 1, 0);
+  sentenceView->selectionModel()->setCurrentIndex(idx, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+  sentenceView->scrollTo(idx);
+}
