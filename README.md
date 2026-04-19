@@ -55,7 +55,7 @@ NO! As long as you keep your recording setup stable, you can quit SentRec at any
 
 ### Q: How much audio do I need to train a Piper voice?
 Depends. If you want to train from a pre-trained checkpoint you can probably get away with recording about 30-60 minutes of varied sentences. But if the pre-trained voice is bad to begin with your result will inherit those characteristics. English pre-trained checkpoints are better than most other languages for obvious reasons.
-If you want to train a voice from scratch in your a non-English language you will need A LOT more! Looking around the internet some say that 10 hours of varied sentences are the minimum! And that's exactly why I made SentRec. I want to train a voice from scratch and I was getting frustrated that no offline software seemed to enable an optimal workflow for this.
+If you want to train a voice from scratch in a non-English language you will need A LOT more! Looking around the internet some say that 10 hours of varied sentences are the minimum! And that's exactly why I made SentRec. I want to train a voice from scratch and I was getting frustrated that no offline software seemed to enable an optimal workflow for this.
 
 ## Todo
 * SH: Implement a "grab noise-floor" button that records 1 second silence and calculates a noise floor threshold for use with silence removal at beginning and end of audio
