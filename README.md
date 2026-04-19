@@ -1,6 +1,8 @@
 # SentRec
 A sentence recorder specifically catered to Piper TTS training recordings.
 
+![SentRec v0.7.3 screenshot](https://github.com/muldjord/sentrec/blob/main/icons/screenshot.png?raw=true)
+
 Note that this project is currently undergoing heavy development! It is usable for the intended purpose described below. But keep in mind that it is in a somewhat rough state and might contain bugs.
 
 SentRec is an audio recorder catered to an optimal workflow when recording a large sentence dataset (text + audio) that can be used to train text to speech models. SentRec is specifically designed to work with the Piper Text-To-Speech format of `ID|Sentence` lines in a CSV file (with `|` being the delimiter) with corresponding `wav/ID.wav` files.
