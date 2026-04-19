@@ -1,9 +1,9 @@
 # SentRec
 A sentence recorder specifically catered to Piper TTS training recordings.
 
-Note that this project is currently in heavy development. Code might not even compile at this stage. It might not even function in any meaningful way. I will update this notice when the software reaches a state where it is somewhat useful.
+Note that this project is currently undergoing heavy development! It is usable for the intended purpose described below. But keep in mind that it is in a somewhat rough state and might contain bugs.
 
-The aim is to create an audio recorder catered to the workflow required when recording a large sentence dataset (text + audio) that can be used to train text to speech models. This software is specifically designed to work with the Piper Text-To-Speech format of `ID|Sentence` lines in a CSV file (with `|` being the delimiter) with corresponding `wav/ID.wav` files.
+SentRec is an audio recorder catered to an optimal workflow when recording a large sentence dataset (text + audio) that can be used to train text to speech models. SentRec is specifically designed to work with the Piper Text-To-Speech format of `ID|Sentence` lines in a CSV file (with `|` being the delimiter) with corresponding `wav/ID.wav` files.
 
 However this software is only one part of the equation. To record a useful dataset a text sentence corpus also needs to be acquired with a meaningful distribution of sentences. For this purpose I am also working on a sentence extractor that can take basically any large text files as input and extract sentences of varying length and formats from it.
 
@@ -26,9 +26,5 @@ $ make install
 The SentRec executable and peripheral files are installed in `sentrec/release`.
 
 ## Todo
-* MH: When deleting a sentence the corresponding wav file should also be deleted
-* MH: Implement silence removal from beginning and end of newly recorded audio
-* MH: Implement normalization on newly recorded audio
-* MH: Implement a tiny fade at beginning and end of newly recorded audio
 * SH: Implement a "grab noise-floor" button that records 1 second silence and calculates a noise floor threshold for use with silence removal at beginning and end of audio
 * CH: When playing audio, add a moving vertical line that follows audio playing in waveformwidget
