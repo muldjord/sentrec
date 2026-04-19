@@ -26,6 +26,7 @@ public slots:
 signals:
   void sentencesLoaded();
   void enteringSentence(const QString &sentenceId);
+  void deleteFromDisk(const QString &id);
 
 private slots:
   void loadSentences();

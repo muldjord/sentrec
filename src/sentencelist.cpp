@@ -168,6 +168,7 @@ void SentenceList::deleteSentence()
   }
   
   int row = selectedRow.first().row();
+  emit deleteFromDisk(sentenceModel->getRowIdString(row));
   qInfo("Removing row %d", row);
   // This automatically calls removeRows (plural) in the selectionModel
   sentenceModel->removeRow(row);
