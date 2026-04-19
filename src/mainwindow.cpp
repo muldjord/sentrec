@@ -130,6 +130,7 @@ void MainWindow::updateFromConfig()
 {
   // Update internal config to match ini settings
   settings.csvBackup = iniSettings->value("main/csvBackup", true).toBool();
+  settings.askDelete = iniSettings->value("main/askDelete", true).toBool();
 
   QByteArray deviceId = iniSettings->value("audio/inputDeviceId", "").toByteArray();
   for(const auto &device: QMediaDevices::audioInputs()) {
