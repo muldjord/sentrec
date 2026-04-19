@@ -34,12 +34,23 @@ AudioRecorder::AudioRecorder(QWidget *parent)
   inputDeviceChanged(deviceCombo->currentIndex());
   
   waveformWidget = new WaveformWidget;
+
   recordButton = new QPushButton(tr("Record"));
+  recordButton->setIcon(QIcon(":record.png"));
+  recordButton->setIconSize(QSize(32, 32));
   recordButton->setCheckable(true);
-  //stopButton = new QPushButton(tr("Stop"));
+
   playButton = new QPushButton(tr("Play"));
-  prevButton = new QPushButton(tr("<< Previous"));
-  nextButton = new QPushButton(tr("Next >>"));
+  playButton->setIcon(QIcon(":play.png"));
+  playButton->setIconSize(QSize(32, 32));
+
+  prevButton = new QPushButton(tr("Previous"));
+  prevButton->setIcon(QIcon(":previous.png"));
+  prevButton->setIconSize(QSize(32, 32));
+
+  nextButton = new QPushButton(tr("Next"));
+  nextButton->setIcon(QIcon(":next.png"));
+  nextButton->setIconSize(QSize(32, 32));
 
   auto deviceLayout = new QHBoxLayout;
   deviceLayout->addWidget(deviceLabel);
@@ -54,7 +65,7 @@ AudioRecorder::AudioRecorder(QWidget *parent)
   //buttonLayout->addWidget(stopButton);
   buttonLayout->addWidget(playButton);
   buttonLayout->addWidget(nextButton);
-
+  
   auto vLayout = new QVBoxLayout;
   vLayout->addLayout(deviceLayout);
   vLayout->addWidget(waveformWidget);
@@ -127,13 +138,17 @@ void AudioRecorder::toggleRecording()
     }
     startRecording();
     recordButton->setText(tr("Stop"));
+    recordButton->setIcon(QIcon(":stop.png"));
     playButton->setEnabled(false);
     nextButton->setEnabled(false);
+    prevButton->setEnabled(false);
   } else {
     stopRecording();
     recordButton->setText(tr("Record"));
+    recordButton->setIcon(QIcon(":record.png"));
     playButton->setEnabled(true);
     nextButton->setEnabled(true);
+    prevButton->setEnabled(true);
   }
 }
 
