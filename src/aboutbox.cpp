@@ -65,17 +65,12 @@ AboutBox::AboutBox(QWidget *parent): QDialog(parent)
   topLayout->setStretch(2, 2);
 
   QLabel *releaseInfo = new QLabel(authorsText);
-  releaseInfo->setStyleSheet("QLabel { background-color : white; }");
 
   QScrollArea *releaseInfoScroll = new QScrollArea();
   releaseInfoScroll->setWidget(releaseInfo);
-  releaseInfoScroll->setStyleSheet("QScrollArea { background-color : white; }");
 
   QLabel *license = new QLabel(gplText);
-  license->setStyleSheet("QLabel { font-family: monospace; "
-                     "background-color : white; }");
   licenseScroll = new QScrollArea();
-  licenseScroll->setStyleSheet("QScrollArea { background-color : white; }");
   licenseScroll->setWidget(license);
 
   connect(licenseScroll->verticalScrollBar(), &QScrollBar::sliderPressed,
