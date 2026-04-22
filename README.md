@@ -1,8 +1,4 @@
 # SentRec
-NOTE! Project is currently broken when it comes to audio input setup. I'll fix it shortly.
-
-----
-
 A sentence recorder specifically catered to Piper TTS training recordings. Note that this project is currently under heavy development! It works as intended but might have some rough edges here and there.
 
 ![SentRec v0.7.3 screenshot](https://github.com/muldjord/sentrec/blob/main/icons/screenshot.png?raw=true)
