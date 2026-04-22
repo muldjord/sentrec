@@ -27,9 +27,16 @@ AudioRecorder::AudioRecorder(QWidget *parent)
   for(const auto &device: QMediaDevices::audioInputs()) {
     deviceCombo->addItem(device.description(), device.id());
   }
-  connect(deviceCombo, &QComboBox::currentIndexChanged, this, &AudioRecorder::inputDeviceChanged);
 
-  deviceCombo->findData(iniSettings->value("audio/inputDevice", QByteArray()).toByteArray());
+  QByteArray inputDeviceId = iniSettings->value("audio/inputDevice", "").toByteArray();
+  int inputDeviceIdx = deviceCombo->findData(inputDeviceId);
+  if(inputDeviceIdx != -1) {
+    deviceCombo->setCurrentIndex(deviceCombo->findData(inputDeviceId));
+  } else {
+    deviceCombo->setCurrentIndex(deviceCombo->findData(QMediaDevices::defaultAudioInput().id()));
+  }
+  inputDeviceChanged(deviceCombo->currentIndex());
+  connect(deviceCombo, &QComboBox::currentIndexChanged, this, &AudioRecorder::inputDeviceChanged);
 
   waveformWidget = new WaveformWidget;
 
@@ -212,8 +219,12 @@ void AudioRecorder::playRecording()
   qDebug("Starting playback! State: %d", audioSink->state());
 
   // If currently playing, don't play again until it's done!
-  if(audioSink && audioSink->state() != QtAudio::StoppedState) {
-    return;
+  if(audioSink) {
+    if(audioSink->state() == QAudio::ActiveState) {
+      return;
+    } else if(audioSink->state() == QAudio::IdleState) {
+      audioSink->stop();
+    }
   }
   audioOut = audioSink->start();
   if(audioOut) {
@@ -225,7 +236,7 @@ void AudioRecorder::playRecording()
 
 void AudioRecorder::inputDeviceChanged(int index)
 {
-  QByteArray deviceId = deviceCombo->currentData(index).toByteArray();
+  QByteArray deviceId = deviceCombo->currentData().toByteArray();
   for(const auto &device: QMediaDevices::audioInputs()) {
     if(device.id() == deviceId) {
       inputDevice = device;
