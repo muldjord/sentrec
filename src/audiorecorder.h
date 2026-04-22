@@ -27,6 +27,7 @@ signals:
   void selectPreviousSentence();
 
 private slots:
+  void refreshInputDevices();
   void inputDeviceChanged(int index);
   void samplerateChanged(int index);
   void toggleRecording();
@@ -40,7 +41,7 @@ private:
   void setInputDevice();
   void setOutputDevice();
 
-  QComboBox *deviceCombo = nullptr;
+  QComboBox *devicesCombo = nullptr;
   QComboBox *samplerateCombo = nullptr;
 
   WaveformWidget *waveformWidget = nullptr;

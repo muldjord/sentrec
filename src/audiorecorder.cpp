@@ -23,20 +23,14 @@ AudioRecorder::AudioRecorder(QWidget *parent)
   connect(samplerateCombo, &QComboBox::activated, this, &AudioRecorder::samplerateChanged);
 
   QLabel *deviceLabel = new QLabel(tr("Input device:"));
-  deviceCombo = new QComboBox;
-  for(const auto &device: QMediaDevices::audioInputs()) {
-    deviceCombo->addItem(device.description(), device.id());
-  }
+  QPushButton *refreshDevicesButton = new QPushButton(this);
+  refreshDevicesButton->setIcon(QIcon(":refresh.png"));
+  refreshDevicesButton->setIconSize(QSize(20, 20));
+  connect(refreshDevicesButton, &QPushButton::clicked, this, &AudioRecorder::refreshInputDevices);
 
-  QByteArray inputDeviceId = iniSettings->value("audio/inputDeviceId", "").toByteArray();
-  int inputDeviceIdx = deviceCombo->findData(inputDeviceId);
-  if(inputDeviceIdx != -1) {
-    deviceCombo->setCurrentIndex(deviceCombo->findData(inputDeviceId));
-  } else {
-    deviceCombo->setCurrentIndex(deviceCombo->findData(QMediaDevices::defaultAudioInput().id()));
-  }
-  inputDeviceChanged(deviceCombo->currentIndex());
-  connect(deviceCombo, &QComboBox::currentIndexChanged, this, &AudioRecorder::inputDeviceChanged);
+  devicesCombo = new QComboBox;
+  connect(devicesCombo, &QComboBox::activated, this, &AudioRecorder::inputDeviceChanged);
+  refreshInputDevices();
 
   waveformWidget = new WaveformWidget;
 
@@ -59,7 +53,8 @@ AudioRecorder::AudioRecorder(QWidget *parent)
 
   auto deviceLayout = new QHBoxLayout;
   deviceLayout->addWidget(deviceLabel);
-  deviceLayout->addWidget(deviceCombo);
+  deviceLayout->addWidget(refreshDevicesButton);
+  deviceLayout->addWidget(devicesCombo);
   deviceLayout->addWidget(samplerateLabel);
   deviceLayout->addWidget(samplerateCombo);
   deviceLayout->addStretch(1);
@@ -234,9 +229,27 @@ void AudioRecorder::playRecording()
   }
 }
 
+void AudioRecorder::refreshInputDevices()
+{
+  devicesCombo->clear();
+  for(const auto &device: QMediaDevices::audioInputs()) {
+    devicesCombo->addItem(device.description(), device.id());
+  }
+
+  QByteArray inputDeviceId = iniSettings->value("audio/inputDeviceId", "").toByteArray();
+  int inputDeviceIdx = devicesCombo->findData(inputDeviceId);
+  if(inputDeviceIdx != -1) {
+    devicesCombo->setCurrentIndex(devicesCombo->findData(inputDeviceId));
+  } else {
+    devicesCombo->setCurrentIndex(devicesCombo->findData(QMediaDevices::defaultAudioInput().id()));
+  }
+
+  inputDeviceChanged(devicesCombo->currentIndex());
+}
+
 void AudioRecorder::inputDeviceChanged(int index)
 {
-  QByteArray deviceId = deviceCombo->currentData().toByteArray();
+  QByteArray deviceId = devicesCombo->currentData().toByteArray();
   for(const auto &device: QMediaDevices::audioInputs()) {
     if(device.id() == deviceId) {
       inputDevice = device;
