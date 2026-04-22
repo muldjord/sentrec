@@ -10,8 +10,6 @@ struct Settings {
   bool askDelete = true;
   
   // Audio configs
-  QAudioDevice inputDevice;
-  QAudioDevice outputDevice;
   int samplerate = 44100;
   bool autoTrim = true;
   bool autoNormalize = true;

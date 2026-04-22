@@ -16,7 +16,7 @@ extern Settings settings;
 AudioRecorder::AudioRecorder(QWidget *parent)
   : QWidget(parent)
 {
-  settings.outputDevice = QMediaDevices::defaultAudioOutput();
+  outputDevice = QMediaDevices::defaultAudioOutput();
  
   QLabel *samplerateLabel = new QLabel(tr("Samplerate:"));
   samplerateCombo = new QComboBox;
@@ -24,15 +24,13 @@ AudioRecorder::AudioRecorder(QWidget *parent)
 
   QLabel *deviceLabel = new QLabel(tr("Input device:"));
   deviceCombo = new QComboBox;
-  connect(deviceCombo, &QComboBox::activated, this, &AudioRecorder::inputDeviceChanged);
   for(const auto &device: QMediaDevices::audioInputs()) {
     deviceCombo->addItem(device.description(), device.id());
-    if(settings.inputDevice.id() == device.id()) {
-      deviceCombo->setCurrentIndex(deviceCombo->count() - 1);
-    }
   }
-  inputDeviceChanged(deviceCombo->currentIndex());
-  
+  connect(deviceCombo, &QComboBox::currentIndexChanged, this, &AudioRecorder::inputDeviceChanged);
+
+  deviceCombo->findData(iniSettings->value("audio/inputDevice", QByteArray()).toByteArray());
+
   waveformWidget = new WaveformWidget;
 
   recordButton = new QPushButton(tr("Record"));
@@ -176,6 +174,12 @@ void AudioRecorder::startRecording()
   });
 }
 
+/*
+The range of a 16-bit sample integer in a WAV file is from -32,768 to 32,767. This range allows for a total of 65,536 possible amplitude values for each sample.
+
+The 24-bit WAV audio format can represent values between -8,388,608 and 8,388,607 for signed integers, allowing for a total of 16,777,216 discrete values.
+*/  
+
 void AudioRecorder::stopRecording()
 {
   if(audioIn == nullptr) {
@@ -205,10 +209,10 @@ void AudioRecorder::stopRecording()
 
 void AudioRecorder::playRecording()
 {
-  qDebug("Starting playback!");
+  qDebug("Starting playback! State: %d", audioSink->state());
 
   // If currently playing, don't play again until it's done!
-  if(audioSink && audioSink->state() == QAudio::ActiveState) {
+  if(audioSink && audioSink->state() != QtAudio::StoppedState) {
     return;
   }
   audioOut = audioSink->start();
@@ -221,12 +225,11 @@ void AudioRecorder::playRecording()
 
 void AudioRecorder::inputDeviceChanged(int index)
 {
-  QByteArray deviceId = deviceCombo->itemData(index).toByteArray();
-  iniSettings->setValue("audio/inputDeviceId", deviceId);
-
+  QByteArray deviceId = deviceCombo->currentData(index).toByteArray();
   for(const auto &device: QMediaDevices::audioInputs()) {
-    if(deviceId == device.id()) {
-      settings.inputDevice = device;
+    if(device.id() == deviceId) {
+      inputDevice = device;
+      iniSettings->setValue("audio/inputDeviceId", deviceId);
       break;
     }
   }
@@ -238,14 +241,13 @@ void AudioRecorder::inputDeviceChanged(int index)
   samplerates.append(44100);
   samplerates.append(48000);
 
-  int minSamplerate = settings.inputDevice.minimumSampleRate();
-  int maxSamplerate = settings.inputDevice.maximumSampleRate();
+  int minSamplerate = inputDevice.minimumSampleRate();
+  int maxSamplerate = inputDevice.maximumSampleRate();
 
   for(const auto &samplerate: samplerates) {
     if(samplerate >= minSamplerate && samplerate <= maxSamplerate) {
       samplerateCombo->addItem(QString::number(samplerate), samplerate);
       if(samplerate == settings.samplerate) {
-	// This also runs samplerateChanged which in turn initiates the new input device
 	samplerateCombo->setCurrentIndex(samplerateCombo->count() - 1);
       }
     }
@@ -268,17 +270,23 @@ void AudioRecorder::setInputDevice()
   QAudioFormat format;
   format.setSampleRate(settings.samplerate);
   format.setChannelCount(1);
-  format.setSampleFormat(QAudioFormat::Float);
-
+  format.setSampleFormat(QAudioFormat::Unknown);
+  for(const auto &sampleFormat: inputDevice.supportedSampleFormats()) {
+    if(sampleFormat > format.sampleFormat()) {
+      format.setSampleFormat(sampleFormat);
+    }
+  }
+  qDebug("Best sample format supported is: %d", format.sampleFormat());
+  
   if(audioSource) {
     if(audioSource->state() != QAudio::StoppedState) {
       audioSource->stop();
     }
     delete audioSource;
   }
-  audioSource = new QAudioSource(settings.inputDevice, format, this);
+  audioSource = new QAudioSource(inputDevice, format, this);
 
-  qInfo("Set input device to: '%s'", qPrintable(settings.inputDevice.id()));
+  qInfo("Set input device to: '%s'", qPrintable(inputDevice.id()));
 }
 
 void AudioRecorder::setOutputDevice()
@@ -292,7 +300,7 @@ void AudioRecorder::setOutputDevice()
     audioSink->stop();
     delete audioSink;
   }
-  audioSink = new QAudioSink(settings.outputDevice, format, this);
+  audioSink = new QAudioSink(outputDevice, format, this);
 
-  qInfo("Set output device to: '%s'", qPrintable(settings.outputDevice.id()));
+  qInfo("Set output device to: '%s'", qPrintable(outputDevice.id()));
 }
