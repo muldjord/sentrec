@@ -28,7 +28,7 @@ AudioRecorder::AudioRecorder(QWidget *parent)
     deviceCombo->addItem(device.description(), device.id());
   }
 
-  QByteArray inputDeviceId = iniSettings->value("audio/inputDevice", "").toByteArray();
+  QByteArray inputDeviceId = iniSettings->value("audio/inputDeviceId", "").toByteArray();
   int inputDeviceIdx = deviceCombo->findData(inputDeviceId);
   if(inputDeviceIdx != -1) {
     deviceCombo->setCurrentIndex(deviceCombo->findData(inputDeviceId));
