@@ -10,6 +10,7 @@
     <file alias="audio.png">icons/audio.png</file>
     <file alias="quit.png">icons/quit.png</file>
     <file alias="load.png">icons/load.png</file>
+    <file alias="refresh.png">icons/refresh.png</file>
     <file alias="delete.png">icons/delete.png</file>
     <file alias="previous.png">icons/previous.png</file>
     <file alias="record.png">icons/record.png</file>
