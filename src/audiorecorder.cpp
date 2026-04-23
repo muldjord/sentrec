@@ -177,8 +177,8 @@ void AudioRecorder::startRecording()
     QByteArray data = audioIn->readAll();
 
     if(audioSource->format().sampleFormat() == QAudioFormat::UInt8) {
-      const qint8* samples = reinterpret_cast<const qint8*>(data.constData());
-      qint64 sampleCount = data.size() / sizeof(qint8);
+      const quint8* samples = reinterpret_cast<const quint8*>(data.constData());
+      qint64 sampleCount = data.size() / sizeof(quint8);
 
       buffer.reserve(sampleCount);
       
@@ -341,15 +341,12 @@ void AudioRecorder::setInputDevice()
   QAudioFormat format;
   format.setSampleRate(settings.samplerate);
   format.setChannelCount(1);
-  format.setSampleFormat(QAudioFormat::Int32);
-  /*
   format.setSampleFormat(QAudioFormat::Unknown);
   for(const auto &sampleFormat: inputDevice.supportedSampleFormats()) {
     if(sampleFormat > format.sampleFormat()) {
       format.setSampleFormat(sampleFormat);
     }
   }
-  */
   qDebug("Best sample format supported is: %d", format.sampleFormat());
   
   if(audioSource) {
