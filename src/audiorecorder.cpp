@@ -228,8 +228,6 @@ void AudioRecorder::playRecording()
 {
   qDebug("Starting playback! State: %d", audioSink->state());
 
-  // Clean out the buffer and stop playing what is currently playing to prepare for new audio
-  audioSink->reset();
 
   if(audioOut) {
     const char* dataPtr = reinterpret_cast<const char*>(buffer.constData());
@@ -334,6 +332,7 @@ void AudioRecorder::setOutputDevice()
     delete audioSink;
   }
   audioSink = new QAudioSink(outputDevice, format, this);
+  audioOut = audioSink->start();
 
   qInfo("Set output device to: '%s'", qPrintable(outputDevice.id()));
 }
