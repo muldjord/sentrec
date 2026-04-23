@@ -235,7 +235,7 @@ void AudioRecorder::stopRecording()
 
   audioSource->stop();
   if(audioIn) {
-    audioIn->disconnect(this);  // avoid duplicate connections next time
+    disconnect(audioIn);
     audioIn = nullptr;
   }
 
