@@ -228,6 +228,9 @@ void AudioRecorder::playRecording()
 {
   qDebug("Starting playback! State: %d", audioSink->state());
 
+  // Clean out the buffer and stop playing what is currently playing to prepare for new audio
+  audioSink->stop();
+  audioOut = audioSink->start();
 
   if(audioOut) {
     const char* dataPtr = reinterpret_cast<const char*>(buffer.constData());
