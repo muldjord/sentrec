@@ -176,13 +176,46 @@ void AudioRecorder::startRecording()
   connect(audioIn, &QIODevice::readyRead, this, [this]() {
     QByteArray data = audioIn->readAll();
 
-    const float* samples = reinterpret_cast<const float*>(data.constData());
-    qint64 sampleCount = data.size() / sizeof(float);
+    if(audioSource->format().sampleFormat() == QAudioFormat::UInt8) {
+      const qint8* samples = reinterpret_cast<const qint8*>(data.constData());
+      qint64 sampleCount = data.size();
 
-    buffer.reserve(sampleCount);
-    
-    for(int i = 0; i < sampleCount; ++i) {
-      buffer.append(samples[i]);
+      buffer.reserve(sampleCount);
+      
+      for(int i = 0; i < sampleCount; ++i) {
+        float sample = (samples[i] / 128.0) - 1.0; // Convert to float format
+        buffer.append(sample);
+      }
+    } else if(audioSource->format().sampleFormat() == QAudioFormat::Int16) {
+      const qint16* samples = reinterpret_cast<const qint16*>(data.constData());
+      qint64 sampleCount = data.size() / 2;
+
+      buffer.reserve(sampleCount);
+      
+      for(int i = 0; i < sampleCount; ++i) {
+        float sample = (samples[i] / 32768.0);  // Convert to float format
+        buffer.append(sample);
+      }
+    } else if(audioSource->format().sampleFormat() == QAudioFormat::Int32) {
+      const qint32* samples = reinterpret_cast<const qint32*>(data.constData());
+      qint64 sampleCount = data.size() / 4;
+
+      buffer.reserve(sampleCount);
+      
+      for(int i = 0; i < sampleCount; ++i) {
+        float sample = (samples[i] / 2147483648.0); // Convert to float format
+        buffer.append(sample);
+      }
+    } else if(audioSource->format().sampleFormat() == QAudioFormat::Float) {
+      const float* samples = reinterpret_cast<const float*>(data.constData());
+      qint64 sampleCount = data.size() / 4;
+
+      buffer.reserve(sampleCount);
+      
+      for(int i = 0; i < sampleCount; ++i) {
+        float sample = (samples[i]);
+        buffer.append(sample);
+      }
     }
   });
 }
@@ -229,7 +262,11 @@ void AudioRecorder::playRecording()
   qDebug("Starting playback! State: %d", audioSink->state());
 
   // Clean out the buffer and stop playing what is currently playing to prepare for new audio
-  audioSink->stop();
+  if(audioSink) {
+    if(audioSink->state() != QAudio::StoppedState) {
+      audioSink->stop();
+    }
+  }
   audioOut = audioSink->start();
 
   if(audioOut) {
@@ -304,12 +341,15 @@ void AudioRecorder::setInputDevice()
   QAudioFormat format;
   format.setSampleRate(settings.samplerate);
   format.setChannelCount(1);
+  format.setSampleFormat(QAudioFormat::Int32);
+  /*
   format.setSampleFormat(QAudioFormat::Unknown);
   for(const auto &sampleFormat: inputDevice.supportedSampleFormats()) {
     if(sampleFormat > format.sampleFormat()) {
       format.setSampleFormat(sampleFormat);
     }
   }
+  */
   qDebug("Best sample format supported is: %d", format.sampleFormat());
   
   if(audioSource) {
@@ -331,11 +371,13 @@ void AudioRecorder::setOutputDevice()
   format.setSampleFormat(QAudioFormat::Float);
   
   if(audioSink) {
-    audioSink->stop();
+    if(audioSink->state() != QAudio::StoppedState) {
+      audioSink->stop();
+    }
     delete audioSink;
   }
   audioSink = new QAudioSink(outputDevice, format, this);
-  audioOut = audioSink->start();
+  //audioOut = audioSink->start();
 
   qInfo("Set output device to: '%s'", qPrintable(outputDevice.id()));
 }
