@@ -154,12 +154,13 @@ void AudioRecorder::toggleRecording()
 
 void AudioRecorder::startRecording()
 {
-  if(!audioSource) {
+  if(audioSource == nullptr) {
     return;
   }
 
   qInfo("Starting recording!");
   buffer.clear();
+
   audioIn = audioSource->start();
   
   connect(audioIn, &QIODevice::readyRead, this, [this]() {
@@ -184,16 +185,20 @@ The 24-bit WAV audio format can represent values between -8,388,608 and 8,388,60
 
 void AudioRecorder::stopRecording()
 {
-  if(audioIn == nullptr) {
+  if(audioSource == nullptr) {
     return;
   }
   qDebug("Stopping recording!");
 
+  audioSource->stop();
   if(audioIn) {
-    audioIn->disconnect(this);
+    audioIn->disconnect(this);  // avoid duplicate connections next time
+    audioIn = nullptr;
   }
-  audioIn = nullptr;
 
+  // Make sure internal buffers are cleaned out so we are ready for the next recording
+  audioSource->reset();
+  
   if(settings.autoTrim) {
     buffer = AudioProcessor::cutSilence(buffer);
   }
@@ -213,15 +218,9 @@ void AudioRecorder::playRecording()
 {
   qDebug("Starting playback! State: %d", audioSink->state());
 
-  // If currently playing, don't play again until it's done!
-  if(audioSink) {
-    if(audioSink->state() == QAudio::ActiveState) {
-      return;
-    } else if(audioSink->state() == QAudio::IdleState) {
-      audioSink->stop();
-    }
-  }
-  audioOut = audioSink->start();
+  // Clean out the buffer and stop playing what is currently playing to prepare for new audio
+  audioSink->reset();
+
   if(audioOut) {
     const char* dataPtr = reinterpret_cast<const char*>(buffer.constData());
     qsizetype byteCount = buffer.size() * sizeof(float);
