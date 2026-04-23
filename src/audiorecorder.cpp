@@ -23,7 +23,7 @@ AudioRecorder::AudioRecorder(QWidget *parent)
   connect(samplerateCombo, &QComboBox::activated, this, &AudioRecorder::samplerateChanged);
 
   QLabel *deviceLabel = new QLabel(tr("Input device:"));
-  QPushButton *refreshDevicesButton = new QPushButton(this);
+  refreshDevicesButton = new QPushButton(this);
   refreshDevicesButton->setIcon(QIcon(":refresh.png"));
   refreshDevicesButton->setIconSize(QSize(20, 20));
   connect(refreshDevicesButton, &QPushButton::clicked, this, &AudioRecorder::refreshInputDevices);
@@ -139,6 +139,11 @@ void AudioRecorder::toggleRecording()
     startRecording();
     recordButton->setText(tr("Stop"));
     recordButton->setIcon(QIcon(":stop.png"));
+
+    emit disableSentenceList();
+    refreshDevicesButton->setEnabled(false);
+    devicesCombo->setEnabled(false);
+    samplerateCombo->setEnabled(false);
     playButton->setEnabled(false);
     nextButton->setEnabled(false);
     prevButton->setEnabled(false);
@@ -146,6 +151,11 @@ void AudioRecorder::toggleRecording()
     stopRecording();
     recordButton->setText(tr("Record"));
     recordButton->setIcon(QIcon(":record.png"));
+
+    emit enableSentenceList();
+    refreshDevicesButton->setEnabled(true);
+    devicesCombo->setEnabled(true);
+    samplerateCombo->setEnabled(true);
     playButton->setEnabled(true);
     nextButton->setEnabled(true);
     prevButton->setEnabled(true);

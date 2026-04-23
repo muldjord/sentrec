@@ -253,3 +253,13 @@ void SentenceList::sentenceAdvance(const int &delta)
   sentenceView->scrollTo(idx);
 
 }
+
+void SentenceList::disableSentenceList()
+{
+  setEnabled(false);
+}
+
+void SentenceList::enableSentenceList()
+{
+  setEnabled(true);
+}

@@ -23,6 +23,8 @@ public slots:
   void deleteFromDisk(const QString &id);
 		  
 signals:
+  void enableSentenceList();
+  void disableSentenceList();
   void selectNextSentence();
   void selectPreviousSentence();
 
@@ -41,6 +43,7 @@ private:
   void setInputDevice();
   void setOutputDevice();
 
+  QPushButton *refreshDevicesButton = nullptr;
   QComboBox *devicesCombo = nullptr;
   QComboBox *samplerateCombo = nullptr;
 

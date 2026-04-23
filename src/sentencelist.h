@@ -22,7 +22,9 @@ public slots:
   void clearSentenceList();
   void selectPreviousSentence();
   void selectNextSentence();
-
+  void disableSentenceList();
+  void enableSentenceList();
+  
 signals:
   void sentencesLoaded();
   void enteringSentence(const QString &sentenceId);
