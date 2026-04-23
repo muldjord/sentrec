@@ -178,7 +178,7 @@ void AudioRecorder::startRecording()
 
     if(audioSource->format().sampleFormat() == QAudioFormat::UInt8) {
       const qint8* samples = reinterpret_cast<const qint8*>(data.constData());
-      qint64 sampleCount = data.size();
+      qint64 sampleCount = data.size() / sizeof(qint8);
 
       buffer.reserve(sampleCount);
       
@@ -188,7 +188,7 @@ void AudioRecorder::startRecording()
       }
     } else if(audioSource->format().sampleFormat() == QAudioFormat::Int16) {
       const qint16* samples = reinterpret_cast<const qint16*>(data.constData());
-      qint64 sampleCount = data.size() / 2;
+      qint64 sampleCount = data.size() / sizeof(qint16);
 
       buffer.reserve(sampleCount);
       
@@ -198,7 +198,7 @@ void AudioRecorder::startRecording()
       }
     } else if(audioSource->format().sampleFormat() == QAudioFormat::Int32) {
       const qint32* samples = reinterpret_cast<const qint32*>(data.constData());
-      qint64 sampleCount = data.size() / 4;
+      qint64 sampleCount = data.size() / sizeof(qint32);
 
       buffer.reserve(sampleCount);
       
@@ -208,7 +208,7 @@ void AudioRecorder::startRecording()
       }
     } else if(audioSource->format().sampleFormat() == QAudioFormat::Float) {
       const float* samples = reinterpret_cast<const float*>(data.constData());
-      qint64 sampleCount = data.size() / 4;
+      qint64 sampleCount = data.size() / sizeof(float);
 
       buffer.reserve(sampleCount);
       
