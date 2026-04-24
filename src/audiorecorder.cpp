@@ -86,12 +86,12 @@ AudioRecorder::~AudioRecorder()
 
 void AudioRecorder::loadFromDisk(const QString &id)
 {
-  buffer.clear();
+  audioData.clear();
   QString wavFileString = settings.sentenceFileInfo.absolutePath() + "/wav/" + id + ".wav";
   if(QFileInfo::exists(wavFileString)) {
     qInfo("Loading wav with id '%s' into audio recorder", qPrintable(id));
     int wavSamplerate = 0;
-    buffer = loadWav(wavFileString, &wavSamplerate);
+    audioData = loadWav(wavFileString, &wavSamplerate);
     if(settings.samplerate != wavSamplerate) {
       QMessageBox::information(this, tr("Mismatched samplerate"),
 			       tr("Wav file: ") + wavFileString + "\n" +
@@ -102,19 +102,19 @@ void AudioRecorder::loadFromDisk(const QString &id)
 			       QMessageBox::Ok);
     }
   }
-  waveformWidget->setSamples(buffer);
+  waveformWidget->setSamples(audioData);
 
   settings.currentSentenceId = id;
 }
 
 bool AudioRecorder::saveToDisk(const QString &id)
 {
-  if(buffer.isEmpty()) {
-    qDebug("Buffer is empty, not saving to disk.");
+  if(audioData.isEmpty()) {
+    qDebug("audioData is empty, not saving to disk.");
     return true;
   }
   qInfo("Saving wav to disk with id '%s'", qPrintable(id));
-  if(saveWav(settings.sentenceFileInfo.absolutePath() + "/wav/" + id + ".wav", buffer, settings.samplerate)) {
+  if(saveWav(settings.sentenceFileInfo.absolutePath() + "/wav/" + id + ".wav", audioData, settings.samplerate)) {
     return true;
   }
   return false;
@@ -169,7 +169,7 @@ void AudioRecorder::startRecording()
   }
 
   qInfo("Starting recording!");
-  buffer.clear();
+  audioData.clear();
 
   audioIn = audioSource->start();
   
@@ -180,41 +180,41 @@ void AudioRecorder::startRecording()
       const quint8* samples = reinterpret_cast<const quint8*>(data.constData());
       qint64 sampleCount = data.size() / sizeof(quint8);
 
-      buffer.reserve(sampleCount);
+      audioData.reserve(sampleCount);
       
       for(int i = 0; i < sampleCount; ++i) {
         float sample = (samples[i] / 128.0) - 1.0; // Convert to float format
-        buffer.append(sample);
+        audioData.append(sample);
       }
     } else if(audioSource->format().sampleFormat() == QAudioFormat::Int16) {
       const qint16* samples = reinterpret_cast<const qint16*>(data.constData());
       qint64 sampleCount = data.size() / sizeof(qint16);
 
-      buffer.reserve(sampleCount);
+      audioData.reserve(sampleCount);
       
       for(int i = 0; i < sampleCount; ++i) {
         float sample = (samples[i] / 32768.0);  // Convert to float format
-        buffer.append(sample);
+        audioData.append(sample);
       }
     } else if(audioSource->format().sampleFormat() == QAudioFormat::Int32) {
       const qint32* samples = reinterpret_cast<const qint32*>(data.constData());
       qint64 sampleCount = data.size() / sizeof(qint32);
 
-      buffer.reserve(sampleCount);
+      audioData.reserve(sampleCount);
       
       for(int i = 0; i < sampleCount; ++i) {
         float sample = (samples[i] / 2147483648.0); // Convert to float format
-        buffer.append(sample);
+        audioData.append(sample);
       }
     } else if(audioSource->format().sampleFormat() == QAudioFormat::Float) {
       const float* samples = reinterpret_cast<const float*>(data.constData());
       qint64 sampleCount = data.size() / sizeof(float);
 
-      buffer.reserve(sampleCount);
+      audioData.reserve(sampleCount);
       
       for(int i = 0; i < sampleCount; ++i) {
         float sample = (samples[i]);
-        buffer.append(sample);
+        audioData.append(sample);
       }
     }
   });
@@ -239,20 +239,20 @@ void AudioRecorder::stopRecording()
     audioIn = nullptr;
   }
 
-  // Make sure internal buffers are cleaned out so we are ready for the next recording
+  // Make sure internal audioData are cleaned out so we are ready for the next recording
   audioSource->reset();
   
   if(settings.autoTrim) {
-    buffer = AudioProcessor::cutSilence(buffer);
+    audioData = AudioProcessor::cutSilence(audioData);
   }
   if(settings.autoNormalize) {
-    buffer = AudioProcessor::normalize(buffer);
+    audioData = AudioProcessor::normalize(audioData);
   }
   if(settings.autoFade) {
-    buffer = AudioProcessor::fadeEnds(buffer);
+    audioData = AudioProcessor::fadeEnds(audioData);
   }
   
-  waveformWidget->setSamples(buffer);
+  waveformWidget->setSamples(audioData);
 
   saveToDisk(settings.currentSentenceId);
 }
@@ -261,25 +261,24 @@ void AudioRecorder::playRecording()
 {
   qDebug("Starting playback! State: %d", audioSink->state());
 
-  // Clean out the buffer and stop playing what is currently playing to prepare for new audio
-  if(audioSink != nullptr) {
-    audioSink->stop();
-  } else {
+  if(audioSink == nullptr) {
     return;
+  } else {
+    audioSink->stop();
   }
 
-  if(audioOut != nullptr) {
-    audioOut->deleteLater();
-    audioOut = nullptr;
+  if(outBuffer != nullptr) {
+    outBuffer->deleteLater();
+    outBuffer = nullptr;
   }
-  const char* dataPtr = reinterpret_cast<const char*>(buffer.constData());
-  qsizetype byteCount = buffer.size() * sizeof(float);
+  const char* dataPtr = reinterpret_cast<const char*>(audioData.constData());
+  qsizetype byteCount = audioData.size() * sizeof(float);
 
-  audioOut = new QBuffer(this);
-  audioOut->setData(dataPtr, byteCount);
-  audioOut->open(QIODevice::ReadOnly);
+  outBuffer = new QBuffer(this);
+  outBuffer->setData(dataPtr, byteCount);
+  outBuffer->open(QIODevice::ReadOnly);
         
-  audioSink->start(audioOut);
+  audioSink->start(outBuffer);
 }
 
 void AudioRecorder::refreshInputDevices()
@@ -380,7 +379,6 @@ void AudioRecorder::setOutputDevice()
     delete audioSink;
   }
   audioSink = new QAudioSink(outputDevice, format, this);
-  //audioOut = audioSink->start();
 
   qInfo("Set output device to: '%s'", qPrintable(outputDevice.id()));
 }

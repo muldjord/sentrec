@@ -63,7 +63,7 @@ private:
   QAudioSink *audioSink = nullptr;
   
   QIODevice *audioIn = nullptr;
-  QBuffer *audioOut;
+  QBuffer *outBuffer = nullptr;
 
-  QVector<float> buffer;
+  QVector<float> audioData;
 };
