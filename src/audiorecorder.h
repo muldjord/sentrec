@@ -61,7 +61,6 @@ private:
   QPushButton *nextButton = nullptr;
   
   QAudioDevice inputDevice;
-  QAudioDevice outputDevice;
 
   QAudioSource *audioSource = nullptr;
   QAudioSink *audioSink = nullptr;
