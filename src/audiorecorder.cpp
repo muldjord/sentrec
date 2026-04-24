@@ -247,6 +247,8 @@ void AudioRecorder::stopRecording()
 
   if(audioIn != nullptr) {
     disconnect(audioIn, &QIODevice::readyRead, this, &AudioRecorder::appendAudioData);
+    // Never delete audioIn as it points to the QIODevice inside of audioSource
+    // But we can 'reset' it by setting our pointer to nullptr
     audioIn = nullptr;
   }
 
