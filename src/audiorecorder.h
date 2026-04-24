@@ -37,6 +37,7 @@ private slots:
   void audioSinkStateChanged(QAudio::State state);
   void toggleRecording();
   void startRecording();
+  void appendAudioData();
   void stopRecording(); 
   void playRecording();
   void waveUpdate();
