@@ -15,6 +15,11 @@ QVector<float> AudioProcessor::cutSilence(const QVector<float> &samples)
   int avgWindow = smpsPerMs * 100; // ms of audio
   float avg = 0.0;
 
+  if(samples.size() < padding * 2 ||
+     samples.size() < avgWindow) {
+    return samples;
+  }
+  
   // Initial average calculation
   for(int i = 0; i < avgWindow; ++i) {
     avg += std::fabs(samples[i]);
