@@ -79,9 +79,9 @@ AudioRecorder::AudioRecorder(QWidget *parent)
 
   setLayout(vLayout);
 
-  playheadTimer.setInterval(25);
-  playheadTimer.setSingleShot(false);
-  connect(&playheadTimer, &QTimer::timeout, this, &AudioRecorder::updatePlayhead);
+  waveUpdateTimer.setInterval(25);
+  waveUpdateTimer.setSingleShot(false);
+  connect(&waveUpdateTimer, &QTimer::timeout, this, &AudioRecorder::waveUpdate);
 }
 
 AudioRecorder::~AudioRecorder()
@@ -148,7 +148,6 @@ void AudioRecorder::toggleRecording()
       recordButton->setChecked(false);
       return;
     }
-    startRecording();
     recordButton->setText(tr("Stop"));
     recordButton->setIcon(QIcon(":stop.png"));
 
@@ -159,6 +158,8 @@ void AudioRecorder::toggleRecording()
     playButton->setEnabled(false);
     nextButton->setEnabled(false);
     prevButton->setEnabled(false);
+
+    startRecording();
   } else {
     stopRecording();
     recordButton->setText(tr("Record"));
@@ -184,9 +185,12 @@ void AudioRecorder::startRecording()
   audioData.clear();
 
   audioIn = audioSource->start();
-  playheadTimer.start();
 
   connect(audioIn, &QIODevice::readyRead, this, [this]() {
+    // Ignore first 1.5 seconds of audio because interface is still settling down and delivering garbage
+    if(audioSource->elapsedUSecs() < 1500000) {
+      audioData.clear();
+    }
     QByteArray data = audioIn->readAll();
 
     if(audioSource->format().sampleFormat() == QAudioFormat::UInt8) {
@@ -231,6 +235,8 @@ void AudioRecorder::startRecording()
       }
     }
   });
+
+  waveUpdateTimer.start();
 }
 
 void AudioRecorder::stopRecording()
@@ -240,7 +246,7 @@ void AudioRecorder::stopRecording()
   }
   qDebug("Stopping recording!");
 
-  playheadTimer.stop();
+  waveUpdateTimer.stop();
 
   audioSource->stop();
   if(audioIn) {
@@ -290,7 +296,7 @@ void AudioRecorder::playRecording()
   audioSink->start(outBuffer);
 }
 
-void AudioRecorder::updatePlayhead()
+void AudioRecorder::waveUpdate()
 {
   if(outBuffer != nullptr) {
     waveformWidget->setPlayheadPos(((audioSink->elapsedUSecs() / 1000) * (settings.samplerate / 1000)) * sizeof(float));
@@ -302,9 +308,9 @@ void AudioRecorder::updatePlayhead()
 void AudioRecorder::audioSinkStateChanged(QAudio::State state)
 {
   if(state == QtAudio::ActiveState) {
-    playheadTimer.start();
+    waveUpdateTimer.start();
   } else {
-    playheadTimer.stop();
+    waveUpdateTimer.stop();
     waveformWidget->setPlayheadPos(0);
   }
 }

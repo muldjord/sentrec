@@ -39,7 +39,7 @@ private slots:
   void startRecording();
   void stopRecording(); 
   void playRecording();
-  void updatePlayhead();
+  void waveUpdate();
   
 private:
   bool saveToDisk(const QString &id);
@@ -47,7 +47,7 @@ private:
   void setInputDevice();
   void setOutputDevice();
 
-  QTimer playheadTimer;
+  QTimer waveUpdateTimer;
 
   QPushButton *refreshDevicesButton = nullptr;
   QComboBox *devicesCombo = nullptr;
