@@ -138,7 +138,7 @@ void AudioRecorder::deleteFromDisk(const QString &id)
 void AudioRecorder::toggleRecording()
 {
   if(recordButton->isChecked()) {
-    if(audioSink->state() == QAudio::ActiveState) {
+    if(audioSink != nullptr && audioSink->state() == QAudio::ActiveState) {
       recordButton->setChecked(false);
       return;
     }
