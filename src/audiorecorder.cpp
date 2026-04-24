@@ -16,8 +16,6 @@ extern Settings settings;
 AudioRecorder::AudioRecorder(QWidget *parent)
   : QWidget(parent)
 {
-  outputDevice = QMediaDevices::defaultAudioOutput();
- 
   QLabel *samplerateLabel = new QLabel(tr("Samplerate:"));
   samplerateCombo = new QComboBox;
   connect(samplerateCombo, &QComboBox::activated, this, &AudioRecorder::samplerateChanged);
@@ -274,31 +272,33 @@ void AudioRecorder::stopRecording()
 
 void AudioRecorder::playRecording()
 {
-  qDebug("Starting playback! State: %d", audioSink->state());
-
-  if(audioSink == nullptr) {
-    return;
-  } else {
+  if(audioSink != nullptr) {
     audioSink->stop();
+    outBuffer.close();
+    delete audioSink;
   }
-
-  if(outBuffer != nullptr) {
-    outBuffer->deleteLater();
-    outBuffer = nullptr;
-  }
+    
+  qDebug("Starting playback!");
+  
+  QAudioFormat format;
+  format.setSampleRate(settings.samplerate);
+  format.setChannelCount(1);
+  format.setSampleFormat(QAudioFormat::Float);
+  
   const char* dataPtr = reinterpret_cast<const char*>(audioData.constData());
   qsizetype byteCount = audioData.size() * sizeof(float);
-
-  outBuffer = new QBuffer(this);
-  outBuffer->setData(dataPtr, byteCount);
-  outBuffer->open(QIODevice::ReadOnly);
-        
-  audioSink->start(outBuffer);
+  
+  outBuffer.setData(dataPtr, byteCount);
+  outBuffer.open(QIODevice::ReadOnly);
+  
+  audioSink = new QAudioSink(format, this);
+  connect(audioSink, &QAudioSink::stateChanged, this, &AudioRecorder::audioSinkStateChanged);
+  audioSink->start(&outBuffer);
 }
 
 void AudioRecorder::waveUpdate()
 {
-  if(outBuffer != nullptr) {
+  if(outBuffer.isOpen()) {
     waveformWidget->setPlayheadPos(((audioSink->elapsedUSecs() / 1000) * (settings.samplerate / 1000)) * sizeof(float));
   } else {
     waveformWidget->update();
@@ -307,7 +307,7 @@ void AudioRecorder::waveUpdate()
 
 void AudioRecorder::audioSinkStateChanged(QAudio::State state)
 {
-  if(state == QtAudio::ActiveState) {
+  if(state == QAudio::ActiveState) {
     waveUpdateTimer.start();
   } else {
     waveUpdateTimer.stop();
@@ -372,7 +372,6 @@ void AudioRecorder::samplerateChanged(int index)
   settings.samplerate = samplerate;
 
   setInputDevice();
-  setOutputDevice();
 }
 
 void AudioRecorder::setInputDevice()
@@ -397,23 +396,4 @@ void AudioRecorder::setInputDevice()
   audioSource = new QAudioSource(inputDevice, format, this);
 
   qInfo("Set input device to: '%s'", qPrintable(inputDevice.id()));
-}
-
-void AudioRecorder::setOutputDevice()
-{
-  QAudioFormat format;
-  format.setSampleRate(settings.samplerate);
-  format.setChannelCount(1);
-  format.setSampleFormat(QAudioFormat::Float);
-  
-  if(audioSink) {
-    if(audioSink->state() != QAudio::StoppedState) {
-      audioSink->stop();
-    }
-    delete audioSink;
-  }
-  audioSink = new QAudioSink(outputDevice, format, this);
-  connect(audioSink, &QAudioSink::stateChanged, this, &AudioRecorder::audioSinkStateChanged);
-
-  qInfo("Set output device to: '%s'", qPrintable(outputDevice.id()));
 }

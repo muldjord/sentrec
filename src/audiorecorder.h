@@ -45,7 +45,6 @@ private:
   bool saveToDisk(const QString &id);
 
   void setInputDevice();
-  void setOutputDevice();
 
   QTimer waveUpdateTimer;
 
@@ -68,7 +67,7 @@ private:
   QAudioSink *audioSink = nullptr;
   
   QIODevice *audioIn = nullptr;
-  QBuffer *outBuffer = nullptr;
+  QBuffer outBuffer;
 
   QVector<float> audioData;
 };
