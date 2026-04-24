@@ -9,7 +9,7 @@ extern Settings settings;
 QVector<float> AudioProcessor::cutSilence(const QVector<float> &samples)
 {
   int smpsPerMs = round(settings.samplerate / 1000.0);
-  int padding = smpsPerMs * 250; // ms audio padding at beginning and end after removing silence
+  int padding = smpsPerMs * 150; // ms audio padding at beginning and end after removing silence
 
   // First non-silence detection from left BEGIN
   int avgWindow = smpsPerMs * 100; // ms of audio
