@@ -84,10 +84,6 @@ AudioRecorder::AudioRecorder(QWidget *parent)
 
 AudioRecorder::~AudioRecorder()
 {
-  if(audioSink->state() != QAudio::StoppedState) {
-    audioSink->stop();
-  }
-  delete audioSink;
 }
 
 void AudioRecorder::loadFromDisk(const QString &id)
@@ -187,7 +183,7 @@ void AudioRecorder::startRecording()
   connect(audioIn, &QIODevice::readyRead, this, [this]() {
     // Ignore first 1.5 seconds of audio because interface is still settling down and delivering garbage
     if(audioSource->elapsedUSecs() < 1500000) {
-      audioData.clear();
+      return;
     }
     QByteArray data = audioIn->readAll();
 
@@ -284,14 +280,16 @@ void AudioRecorder::playRecording()
   format.setSampleRate(settings.samplerate);
   format.setChannelCount(1);
   format.setSampleFormat(QAudioFormat::Float);
-  
+
   const char* dataPtr = reinterpret_cast<const char*>(audioData.constData());
   qsizetype byteCount = audioData.size() * sizeof(float);
   
   outBuffer.setData(dataPtr, byteCount);
   outBuffer.open(QIODevice::ReadOnly);
+
+  QAudioDevice outputDevice = QMediaDevices::defaultAudioOutput();
   
-  audioSink = new QAudioSink(format, this);
+  audioSink = new QAudioSink(outputDevice, format, this);
   connect(audioSink, &QAudioSink::stateChanged, this, &AudioRecorder::audioSinkStateChanged);
   audioSink->start(&outBuffer);
 }
