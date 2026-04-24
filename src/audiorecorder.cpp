@@ -32,7 +32,7 @@ AudioRecorder::AudioRecorder(QWidget *parent)
   connect(devicesCombo, &QComboBox::activated, this, &AudioRecorder::inputDeviceChanged);
   refreshInputDevices();
 
-  waveformWidget = new WaveformWidget;
+  waveformWidget = new WaveformWidget(audioData, this);
 
   recordButton = new QPushButton(tr("Record"));
   recordButton->setIcon(QIcon(":record.png"));
@@ -78,10 +78,18 @@ AudioRecorder::AudioRecorder(QWidget *parent)
   connect(nextButton, &QPushButton::clicked, this, [this]() { emit selectNextSentence(); });
 
   setLayout(vLayout);
+
+  playheadTimer.setInterval(25);
+  playheadTimer.setSingleShot(false);
+  connect(&playheadTimer, &QTimer::timeout, this, &AudioRecorder::updatePlayhead);
 }
 
 AudioRecorder::~AudioRecorder()
 {
+  if(audioSink->state() != QAudio::StoppedState) {
+    audioSink->stop();
+  }
+  delete audioSink;
 }
 
 void AudioRecorder::loadFromDisk(const QString &id)
@@ -132,6 +140,10 @@ void AudioRecorder::deleteFromDisk(const QString &id)
 void AudioRecorder::toggleRecording()
 {
   if(recordButton->isChecked()) {
+    if(audioSink->state() == QAudio::ActiveState) {
+      recordButton->setChecked(false);
+      return;
+    }
     if(settings.currentSentenceId.isEmpty()) {
       recordButton->setChecked(false);
       return;
@@ -172,7 +184,8 @@ void AudioRecorder::startRecording()
   audioData.clear();
 
   audioIn = audioSource->start();
-  
+  playheadTimer.start();
+
   connect(audioIn, &QIODevice::readyRead, this, [this]() {
     QByteArray data = audioIn->readAll();
 
@@ -220,18 +233,14 @@ void AudioRecorder::startRecording()
   });
 }
 
-/*
-The range of a 16-bit sample integer in a WAV file is from -32,768 to 32,767. This range allows for a total of 65,536 possible amplitude values for each sample.
-
-The 24-bit WAV audio format can represent values between -8,388,608 and 8,388,607 for signed integers, allowing for a total of 16,777,216 discrete values.
-*/  
-
 void AudioRecorder::stopRecording()
 {
   if(audioSource == nullptr) {
     return;
   }
   qDebug("Stopping recording!");
+
+  playheadTimer.stop();
 
   audioSource->stop();
   if(audioIn) {
@@ -279,6 +288,25 @@ void AudioRecorder::playRecording()
   outBuffer->open(QIODevice::ReadOnly);
         
   audioSink->start(outBuffer);
+}
+
+void AudioRecorder::updatePlayhead()
+{
+  if(outBuffer != nullptr) {
+    waveformWidget->setPlayheadPos(((audioSink->elapsedUSecs() / 1000) * (settings.samplerate / 1000)) * sizeof(float));
+  } else {
+    waveformWidget->update();
+  }
+}
+
+void AudioRecorder::audioSinkStateChanged(QAudio::State state)
+{
+  if(state == QtAudio::ActiveState) {
+    playheadTimer.start();
+  } else {
+    playheadTimer.stop();
+    waveformWidget->setPlayheadPos(0);
+  }
 }
 
 void AudioRecorder::refreshInputDevices()
@@ -379,6 +407,7 @@ void AudioRecorder::setOutputDevice()
     delete audioSink;
   }
   audioSink = new QAudioSink(outputDevice, format, this);
+  connect(audioSink, &QAudioSink::stateChanged, this, &AudioRecorder::audioSinkStateChanged);
 
   qInfo("Set output device to: '%s'", qPrintable(outputDevice.id()));
 }

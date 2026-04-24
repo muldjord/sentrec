@@ -64,5 +64,4 @@ Nope, it does not. SentRec was mainly made to create datasets for Home Assistant
 
 ## Todo
 * SH: Implement a "grab noise-floor" button that records 1 second silence and calculates a noise floor threshold for use with silence removal at beginning and end of audio
-* CH: When playing audio, add a moving vertical line that follows audio playing in waveformwidget
 * CH: Progress indicator showing what sentence is selected and how many there are in total

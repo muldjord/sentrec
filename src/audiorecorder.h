@@ -10,6 +10,7 @@
 #include <QAudioSource>
 #include <QAudioSink>
 #include <QBuffer>
+#include <QTimer>
 
 class AudioRecorder : public QWidget
 {
@@ -33,16 +34,20 @@ private slots:
   void refreshInputDevices();
   void inputDeviceChanged(int index);
   void samplerateChanged(int index);
+  void audioSinkStateChanged(QAudio::State state);
   void toggleRecording();
   void startRecording();
   void stopRecording(); 
   void playRecording();
-
+  void updatePlayhead();
+  
 private:
   bool saveToDisk(const QString &id);
 
   void setInputDevice();
   void setOutputDevice();
+
+  QTimer playheadTimer;
 
   QPushButton *refreshDevicesButton = nullptr;
   QComboBox *devicesCombo = nullptr;

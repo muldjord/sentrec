@@ -3,15 +3,18 @@
 #include <QPaintEvent>
 #include <algorithm>
 
-WaveformWidget::WaveformWidget(QWidget *parent)
-  : QWidget(parent)
+WaveformWidget::WaveformWidget(QVector<float> &samples, QWidget *parent)
+  : samples(samples), QWidget(parent)
 {
   setMinimumHeight(200);
 }
 
-void WaveformWidget::setSamples(const QVector<float>& samples)
+void WaveformWidget::setSamples(QVector<float> &samples)
 {
-  buffer = samples;
+  // Reset playhead since new audio is coming in
+  playheadPos = 0;
+
+  samples = samples;
   update();
 }
 
@@ -21,9 +24,9 @@ void WaveformWidget::paintEvent(QPaintEvent *event)
 
   QPainter painter(this);
   painter.fillRect(rect(), Qt::black);
-  painter.setRenderHint(QPainter::Antialiasing, false);
+  painter.setRenderHint(QPainter::Antialiasing, true);
 
-  if(buffer.isEmpty()) {
+  if(samples.isEmpty()) {
     return;
   }
 
@@ -33,7 +36,7 @@ void WaveformWidget::paintEvent(QPaintEvent *event)
   int h = height();
   int midY = h / 2;
 
-  int sampleCount = buffer.size();
+  int sampleCount = samples.size();
 
   // Downsampling factor: how many samples per pixel column
   float samplesPerPixel = static_cast<float>(sampleCount) / w;
@@ -49,7 +52,7 @@ void WaveformWidget::paintEvent(QPaintEvent *event)
     float maxVal = -1.0f;
     
     for(int i = start; i < end; ++i) {
-      float s = buffer[i];
+      float s = samples[i];
       minVal = std::min(minVal, s);
       maxVal = std::max(maxVal, s);
     }
@@ -59,4 +62,15 @@ void WaveformWidget::paintEvent(QPaintEvent *event)
     
     painter.drawLine(x, y1, x, y2);
   }
+  // Draw playhead
+  painter.setPen(QPen(Qt::blue, 2));
+  float sampleToPixelFactor = (float)w / (samples.size() * sizeof(float));
+  int playheadPixelPos = sampleToPixelFactor * playheadPos;
+  painter.drawLine(playheadPixelPos, 0, playheadPixelPos, h);
+}
+
+void WaveformWidget::setPlayheadPos(const qint64 &pos)
+{
+  playheadPos = pos;
+  update();
 }
