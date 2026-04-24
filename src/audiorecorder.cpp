@@ -262,18 +262,24 @@ void AudioRecorder::playRecording()
   qDebug("Starting playback! State: %d", audioSink->state());
 
   // Clean out the buffer and stop playing what is currently playing to prepare for new audio
-  if(audioSink) {
-    if(audioSink->state() != QAudio::StoppedState) {
-      audioSink->stop();
-    }
+  if(audioSink != nullptr) {
+    audioSink->stop();
+  } else {
+    return;
   }
-  audioOut = audioSink->start();
 
-  if(audioOut) {
-    const char* dataPtr = reinterpret_cast<const char*>(buffer.constData());
-    qsizetype byteCount = buffer.size() * sizeof(float);
-    audioOut->write(dataPtr, byteCount);
+  if(audioOut != nullptr) {
+    audioOut->deleteLater();
+    audioOut = nullptr;
   }
+  const char* dataPtr = reinterpret_cast<const char*>(buffer.constData());
+  qsizetype byteCount = buffer.size() * sizeof(float);
+
+  audioOut = new QBuffer(this);
+  audioOut->setData(dataPtr, byteCount);
+  audioOut->open(QIODevice::ReadOnly);
+        
+  audioSink->start(audioOut);
 }
 
 void AudioRecorder::refreshInputDevices()

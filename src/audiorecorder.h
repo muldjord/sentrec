@@ -9,6 +9,7 @@
 #include <QMediaCaptureSession>
 #include <QAudioSource>
 #include <QAudioSink>
+#include <QBuffer>
 
 class AudioRecorder : public QWidget
 {
@@ -62,7 +63,7 @@ private:
   QAudioSink *audioSink = nullptr;
   
   QIODevice *audioIn = nullptr;
-  QIODevice *audioOut = nullptr;
+  QBuffer *audioOut;
 
   QVector<float> buffer;
 };
