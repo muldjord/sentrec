@@ -63,5 +63,7 @@ If you want to train a voice from scratch in a non-English language you will nee
 Nope, it does not. SentRec was mainly made to create datasets for Home Assistant Piper voice training. And as far as I know Home Assistant doesn't even support multispeaker voices. I personally have no interest in multi-speaker voices.
 
 ## Todo
-* SH: Implement a "grab noise-floor" button that records 1 second silence and calculates a noise floor threshold for use with silence removal at beginning and end of audio
-* CH: Progress indicator showing what sentence is selected and how many there are in total
+* SH: Progress indicator showing what sentence is selected and how many there are in total
+* SH: Add configurable padding length, average window span and average span noise threshold multiplier in Preferences->Audio
+* SH: Add configurable output device in Preferences->Audio
+* CH: Implement a "grab noise-floor" button that records 1 second silence and calculates a noise floor threshold for use with silence removal at beginning and end of audio
