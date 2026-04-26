@@ -186,8 +186,8 @@ void AudioRecorder::startRecording()
 
   audioIn = audioSource->start();
 
+  waveformWidget->setState(SR::INIT);
   connect(audioIn, &QIODevice::readyRead, this, &AudioRecorder::appendAudioData);
-
 }
 
 void AudioRecorder::appendAudioData()
@@ -256,6 +256,7 @@ void AudioRecorder::appendAudioData()
     }
     if(foundAbove && foundBelow) {
       audioData.append(incomingAudioData);
+      waveformWidget->setState(SR::DATA);
     }
   } else {
     audioData.append(incomingAudioData);
