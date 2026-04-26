@@ -66,14 +66,30 @@ AudioPage::AudioPage(QSettings &settings, QWidget *parent) : QWidget(parent), se
   ConfigCheckBox *autoTrimCheckBox = new ConfigCheckBox(settings, tr("Trim silence from beginning and end after recording"), "audio", "autoTrim", true);
   connect(resetButton, &QPushButton::clicked, autoTrimCheckBox, &ConfigCheckBox::resetToDefault);
 
+  ConfigSlider *autoTrimPaddingSlider = new ConfigSlider(settings, "audio", "autoTrimPaddingMs", 150,
+                                                    0, 2000,
+                                                    tr("Trim padding:"), tr("milliseconds"), true);
+  connect(resetButton, &QPushButton::clicked, autoTrimPaddingSlider, &ConfigSlider::resetToDefault);
+  ConfigSlider *autoTrimAvgWindowSlider = new ConfigSlider(settings, "audio", "autoTrimAvgWindowMs", 100,
+                                                    0, 200,
+                                                    tr("Trim threshold average window size:"), tr("milliseconds"), true);
+  connect(resetButton, &QPushButton::clicked, autoTrimAvgWindowSlider, &ConfigSlider::resetToDefault);
+
   ConfigCheckBox *autoFadeCheckBox = new ConfigCheckBox(settings, tr("Apply fade-in/out after recording"), "audio", "autoFade", true);
   connect(resetButton, &QPushButton::clicked, autoFadeCheckBox, &ConfigCheckBox::resetToDefault);
+  ConfigSlider *autoFadeLengthSlider = new ConfigSlider(settings, "audio", "autoFadeLengthMs", 20,
+                                                    0, 500,
+                                                    tr("Fade-in/out length:"), tr("milliseconds"), true);
+  connect(resetButton, &QPushButton::clicked, autoFadeLengthSlider, &ConfigSlider::resetToDefault);
 
   QVBoxLayout *layout = new QVBoxLayout();
   layout->addWidget(resetButton);
   layout->addWidget(autoNormalizeCheckBox);
   layout->addWidget(autoTrimCheckBox);
+  layout->addWidget(autoTrimPaddingSlider);
+  layout->addWidget(autoTrimAvgWindowSlider);
   layout->addWidget(autoFadeCheckBox);
+  layout->addWidget(autoFadeLengthSlider);
   layout->addStretch();
 
   setLayout(layout);

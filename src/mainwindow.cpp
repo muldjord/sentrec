@@ -135,9 +135,15 @@ void MainWindow::updateFromConfig()
   settings.askDelete = iniSettings->value("main/askDelete", true).toBool();
 
   settings.samplerate = iniSettings->value("audio/samplerate", 44100).toInt();
+
   settings.autoTrim = iniSettings->value("audio/autoTrim", true).toBool();
+  settings.paddingMs = iniSettings->value("audio/autoTrimPaddingMs", 150).toInt();
+  settings.avgWindowMs = iniSettings->value("audio/autoTrimAvgWindowMs", 100).toInt();
+
   settings.autoNormalize = iniSettings->value("audio/autoNormalize", true).toBool();
+
   settings.autoFade = iniSettings->value("audio/autoFade", true).toBool();
+  settings.fadeLengthMs = iniSettings->value("audio/autoFadeLengthMs", 20).toInt();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
