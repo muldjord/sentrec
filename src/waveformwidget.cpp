@@ -38,6 +38,9 @@ void WaveformWidget::paintEvent(QPaintEvent *event)
     painter.drawImage(10, 10, QImage(":record_init.png"));
     break;
   case SR::DATA:
+    if(samples.isEmpty()) {
+      return;
+    }
     painter.setPen(QPen(Qt::green, 1));
 
     int w = width();
