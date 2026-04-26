@@ -182,16 +182,16 @@ void AudioRecorder::startRecording()
 
   connect(audioIn, &QIODevice::readyRead, this, &AudioRecorder::appendAudioData);
 
-  waveUpdateTimer.start();
 }
 
 void AudioRecorder::appendAudioData()
 {
+  QByteArray data = audioIn->readAll();
+  
   // Ignore first 1.5 seconds of audio because interface is still settling down and delivering garbage
   if(audioSource->elapsedUSecs() < 1500000) {
     return;
   }
-  QByteArray data = audioIn->readAll();
 
   if(audioSource->format().sampleFormat() == QAudioFormat::UInt8) {
     const quint8* samples = reinterpret_cast<const quint8*>(data.constData());
@@ -234,6 +234,7 @@ void AudioRecorder::appendAudioData()
       audioData.append(sample);
     }
   }
+  waveUpdateTimer.start();
 }
 
 void AudioRecorder::stopRecording()
