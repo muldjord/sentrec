@@ -13,6 +13,7 @@
     <file alias="refresh.png">icons/refresh.png</file>
     <file alias="delete.png">icons/delete.png</file>
     <file alias="previous.png">icons/previous.png</file>
+    <file alias="record_init.png">icons/record_init.png</file>
     <file alias="record.png">icons/record.png</file>
     <file alias="stop.png">icons/stop.png</file>
     <file alias="play.png">icons/play.png</file>
