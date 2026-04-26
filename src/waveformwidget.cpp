@@ -20,6 +20,7 @@ void WaveformWidget::reset()
 void WaveformWidget::setState(const int &state)
 {
   this->state = state;
+  qDebug("State is: %d", state);
   update();
 }
 
@@ -30,10 +31,6 @@ void WaveformWidget::paintEvent(QPaintEvent *event)
   QPainter painter(this);
   painter.fillRect(rect(), Qt::black);
   painter.setRenderHint(QPainter::Antialiasing, true);
-
-  if(samples.isEmpty()) {
-    return;
-  }
 
   switch(state) {
   case SR::INIT:
