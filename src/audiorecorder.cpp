@@ -84,6 +84,12 @@ AudioRecorder::AudioRecorder(QWidget *parent)
 
 AudioRecorder::~AudioRecorder()
 {
+  if(audioSink != nullptr) {
+    audioSink->stop();
+  }
+  if(audioSource != nullptr) {
+    audioSource->stop();
+  }
 }
 
 void AudioRecorder::loadFromDisk(const QString &id)
