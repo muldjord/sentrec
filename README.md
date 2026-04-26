@@ -36,13 +36,13 @@ When the `Audio recorder` is enabled you should check and make sure that your au
 
 I usually record in 44100 Hz. Piper wants wav files in either 22050 Hz (medium and high quality voices) or 16000 Hz (low quality voice). You could just use 22050 Hz for everything you record, but I like to keep the samplerate higher in case I want to use the dataset for something else later on. You can always downsample. You cannot upsample (well you can, but you will loose quality).
 
-SentRec records and saves samples as 32bit floating point values. This is not configurable! If your audio interface does not support it you will have problems. Most modern interfaces should have no issue though. Not making this configurable made the implementation of filters easier and ensures that there is enough resolution for amplifying the wav files later should you wish to do so.
+SentRec records and saves samples as 32bit floating point values. If your audio interface does not support this precision SentRec will automatically convert it internally. SentRec will use the best precision your interface supports before converting to 32bit floats.
 
 Now we are ready to record! The first sentence will be selected and it is simply a matter of clicking the `Record` button. Two things to note here:
-1. Always take a breath BEFORE clicking record! Inhaling while recording might lead to the inhalation being part of the audio which will ruin your recordings!
-2. Always remember to wait a second before starting to speak the sentence after clicking `Record`! SentRec trims the audio recording automatically (unless you disable it) and it uses the first 20 ms of audio to determine an average noise floor. So it is VERY important that you are quiet when clicking `Record`!
+1. Always breath in BEFORE clicking record! Inhaling while recording might lead to the inhalation being part of the audio which will ruin your recordings!
+2. Always remember to wait a second before starting to speak the sentence after clicking `Record`! SentRec trims the audio recording automatically (unless you disable it) and it uses the first part few milliseconds of audio to determine an average noise floor. So it is VERY important that you are quiet when clicking `Record`!
 
-When you've spoken the sentence click the `Stop` button (same as the `Record` button). SentRec will immediately process the audio and render the resulting audio into the `Waveform view`. At this point the audio has also been saved as a wav file in the `wav` subdirectory (relative to you CSV file). You now have the option of either playing back the audio using the `Play` button or clicking `Next` to move on to the next sentence.
+When you've spoken the sentence click the `Stop` button (same as the `Record` button). SentRec will immediately process the audio and render it into the `Waveform view`. At this point the audio has also been saved as a wav file in the `wav` subdirectory (relative to you CSV file). You now have the option of either playing back the audio using the `Play` button or clicking `Next` to move on to the next sentence.
 
 If this is your first session I would always recommend recording a few sentences and then opening up the `wav` subdirectory and play some of the wav files. Just to make sure everything is the way you want it to be. Check that the wav files have the correct samplerate and bitrate. Check that they play fine in any other audio playing software.
 
@@ -64,6 +64,5 @@ Nope, it does not. SentRec was mainly made to create datasets for Home Assistant
 
 ## Todo
 * SH: Progress indicator showing what sentence is selected and how many there are in total
-* SH: Add configurable padding length, average window span and average span noise threshold multiplier in Preferences->Audio
 * SH: Add configurable output device in Preferences->Audio
 * CH: Implement a "grab noise-floor" button that records 1 second silence and calculates a noise floor threshold for use with silence removal at beginning and end of audio
