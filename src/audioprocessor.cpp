@@ -30,7 +30,7 @@ QVector<float> AudioProcessor::cutSilence(const QVector<float> &samples)
   }
   avg /= avgWindow;
   
-  float silThres = avg * 3.0; // Calculated silence threshold based on first avgWindow
+  float silThres = avg * 3.5; // Calculated silence threshold based on first avgWindow
   qDebug("Silence threshold = %f\n", silThres);
   if(silThres >= 0.1) {
     QMessageBox::warning(nullptr, QObject::tr("Very high noise floor"),
