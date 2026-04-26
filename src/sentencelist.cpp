@@ -90,6 +90,10 @@ void SentenceList::loadSentences()
       QString line = QString::fromUtf8(sentenceFile.readLine().trimmed());
       QVector<QString> cells = line.split('|');
       if(cells.count() != 2) {
+	QMessageBox::critical(this, tr("Format error!"),
+			      tr("One or more lines from the CSV file does not contain exactly 2 pipe-separated columns. Please check that your input CSV has the format of 'ID|Sentence'."),
+			      QMessageBox::Ok,
+			      QMessageBox::Ok);
 	qWarning("Format error!\nLine: %llu, Data: '%s'\nExpected 2 columns / cells but got %llu, loading cancelled!", lineIdx, qPrintable(line), cells.count());
 	return;
       }
