@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="699.03125"
+   height="61.9375"
+   viewBox="0 0 699.03125 61.9375"
+   version="1.1"
+   id="svg1"
+   inkscape:export-filename="../record_init.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   sodipodi:docname="record_init.svg"
+   inkscape:version="1.4.3 (fcd0343856, 2026-01-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="1"
+     inkscape:cx="594.5"
+     inkscape:cy="64.5"
+     inkscape:window-width="3374"
+     inkscape:window-height="1371"
+     inkscape:window-x="434"
+     inkscape:window-y="1112"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <rect
+       x="6.1424518"
+       y="5.4599571"
+       width="1011.457"
+       height="118.75407"
+       id="rect1" />
+    <rect
+       x="4.8259659"
+       y="7.7215457"
+       width="120.16655"
+       height="116.30578"
+       id="rect3" />
+  </defs>
+  <g
+     inkscape:label="Icons"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-5.5988818,-4.8285771)">
+    <text
+       xml:space="preserve"
+       id="text1"
+       style="font-size:64px;font-family:'Noto Sans Adlam';-inkscape-font-specification:'Noto Sans Adlam';writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect1);display:inline;fill:#b0ad13;fill-opacity:1;stroke:#139ab0;stroke-width:8;stroke-linecap:round;stroke-linejoin:round"
+       transform="translate(-6.8249463,-10.237419)"><tspan
+         x="6.1425781"
+         y="63.690996"
+         id="tspan3"><tspan
+           style="font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans';stroke:none"
+           id="tspan2">Initializing recording...</tspan></tspan></text>
+  </g>
+</svg>
