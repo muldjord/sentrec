@@ -9,14 +9,15 @@ extern Settings settings;
 QVector<float> AudioProcessor::cutSilence(const QVector<float> &samples)
 {
   int smpsPerMs = round(settings.samplerate / 1000.0);
-  int padding = smpsPerMs * 150; // ms audio padding at beginning and end after removing silence
+  int padding = smpsPerMs * settings.endPaddingMs; // ms audio padding at beginning and end after removing silence
 
   // First non-silence detection from left BEGIN
-  int avgWindow = smpsPerMs * 100; // ms of audio
+  int avgWindow = smpsPerMs * settings.avgWindowMs; // ms of audio
   float avg = 0.0;
 
   if(samples.size() < padding * 2 ||
      samples.size() < avgWindow) {
+    qDebug("Not enough samples to apply padding, padding not applied!");
     return samples;
   }
   
@@ -102,7 +103,12 @@ QVector<float> AudioProcessor::normalize(const QVector<float> &samples)
 QVector<float> AudioProcessor::fadeEnds(const QVector<float> &samples)
 {
   int smpsPerMs = round(settings.samplerate / 1000.0);
-  int fadeLen = 20 * smpsPerMs; // 20 ms fade applied at beginning and end after adding padding
+  int fadeLen = smpsPerMs * settings.fadeLengthMs; // 20 ms fade applied at beginning and end after adding padding
+
+  if(samples.size() < fadeLen) {
+    qDebug("Not enough samples for applying fade-in/out, fade not applied!");
+    return samples;
+  }
   
   QVector<float> withFades = samples;
 

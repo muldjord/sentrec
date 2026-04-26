@@ -14,4 +14,7 @@ struct Settings {
   bool autoTrim = true;
   bool autoNormalize = true;
   bool autoFade = true;
+  int endPaddingMs = 150;
+  int avgWindowMs = 100;
+  int fadeLengthMs = 20;
 };
