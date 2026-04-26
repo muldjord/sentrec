@@ -9,18 +9,18 @@ WaveformWidget::WaveformWidget(QVector<float> &samples, QWidget *parent)
   setMinimumHeight(200);
 }
 
-void WaveformWidget::setSamples(QVector<float> &samples)
+void WaveformWidget::reset()
 {
   // Reset playhead since new audio is coming in
   playheadPos = 0;
-
-  samples = samples;
   update();
+  state = SR::DATA;
 }
 
 void WaveformWidget::setState(const int &state)
 {
   this->state = state;
+  update();
 }
 
 void WaveformWidget::paintEvent(QPaintEvent *event)

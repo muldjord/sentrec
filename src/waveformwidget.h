@@ -10,7 +10,7 @@ class WaveformWidget : public QWidget
   Q_OBJECT
 public:
   WaveformWidget(QVector<float> &samples, QWidget *parent = nullptr);
-  void setSamples(QVector<float> &samples);
+  void reset();
   void setPlayheadPos(const qint64 &pos);
   void setState(const int &state);
 

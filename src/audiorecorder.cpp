@@ -110,7 +110,7 @@ void AudioRecorder::loadFromDisk(const QString &id)
 			       QMessageBox::Ok);
     }
   }
-  waveformWidget->setSamples(audioData);
+  waveformWidget->reset();
 
   settings.currentSentenceId = id;
 }
@@ -295,9 +295,8 @@ void AudioRecorder::stopRecording()
   if(settings.autoFade) {
     audioData = AudioProcessor::fadeEnds(audioData);
   }
-  
-  waveformWidget->setSamples(audioData);
 
+  waveformWidget->update();
   saveToDisk(settings.currentSentenceId);
 }
 
