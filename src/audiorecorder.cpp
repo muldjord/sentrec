@@ -154,6 +154,7 @@ void AudioRecorder::toggleRecording()
     refreshDevicesButton->setEnabled(false);
     devicesCombo->setEnabled(false);
     samplerateCombo->setEnabled(false);
+    recordButton->setEnabled(false);
     playButton->setEnabled(false);
     nextButton->setEnabled(false);
     prevButton->setEnabled(false);
@@ -183,14 +184,15 @@ void AudioRecorder::startRecording()
   qInfo("Starting recording!");
   audioData.clear();
 
+  waveformWidget->setState(SR::INIT);
   audioIn = audioSource->start();
 
-  waveformWidget->setState(SR::INIT);
   connect(audioIn, &QIODevice::readyRead, this, &AudioRecorder::appendAudioData);
 }
 
 void AudioRecorder::appendAudioData()
 {
+  recordButton->setEnabled(true);
   QAudioFormat::SampleFormat sampleFormat = audioSource->format().sampleFormat();
   QByteArray data = audioIn->readAll();
 
@@ -327,9 +329,6 @@ void AudioRecorder::stopPlaying()
 {
   if(audioSink != nullptr) {
     audioSink->stop();
-    outBuffer.close();
-    delete audioSink;
-    audioSink = nullptr;
   }
 }
 
@@ -349,6 +348,9 @@ void AudioRecorder::audioSinkStateChanged(QAudio::State state)
   } else {
     waveUpdateTimer.stop();
     waveformWidget->setPlayheadPos(0);
+    outBuffer.close();
+    delete audioSink;
+    audioSink = nullptr;
   }
 }
 
