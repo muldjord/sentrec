@@ -9,6 +9,7 @@
 #include <QContextMenuEvent>
 #include <QSettings>
 #include <QFileInfo>
+#include <QLabel>
 
 class SentenceList : public QWidget
 {
@@ -41,4 +42,5 @@ private:
   SentenceModel *sentenceModel = nullptr;
   QTableView *sentenceView;
 
+  QLabel *progressLabel = nullptr;
 };

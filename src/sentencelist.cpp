@@ -36,10 +36,13 @@ SentenceList::SentenceList(QWidget *parent)
   deleteSentenceButton->setIconSize(QSize(32, 32));
   connect(deleteSentenceButton, &QPushButton::clicked, this, &SentenceList::deleteSentence);
 
+  progressLabel = new QLabel("0 / 0");
+  
   QVBoxLayout *buttonLayout = new QVBoxLayout();
   buttonLayout->addWidget(loadSentencesButton);
   buttonLayout->addWidget(deleteSentenceButton);
   buttonLayout->addStretch(1);
+  buttonLayout->addWidget(progressLabel);
 
   QHBoxLayout *layout = new QHBoxLayout();
   layout->addWidget(sentenceView);
@@ -145,6 +148,7 @@ void SentenceList::setSentences(const QVector<CellData> &data)
       break;
     }
   }
+  progressLabel->setText("0 / " + QString::number(sentenceModel->rowCount()));
   emit sentencesLoaded();
 }
 
@@ -207,6 +211,7 @@ void SentenceList::clearSentenceList()
 {
   QVector<CellData> tempList;
   setSentences(tempList);
+  progressLabel->setText("0 / 0");
 }
 
 void SentenceList::selectionChanged(const QModelIndex &current, const QModelIndex &previous)
@@ -222,6 +227,7 @@ void SentenceList::selectionChanged(const QModelIndex &current, const QModelInde
 
   QString newId = sentenceModel->getRowIdString(current.row());
   qDebug("Entering row %d with id '%s'.", current.row(), qPrintable(newId));
+  progressLabel->setText(QString::number(current.row() + 1) + " / " + QString::number(sentenceModel->rowCount()));
   emit enteringSentence(newId);
 }
 
