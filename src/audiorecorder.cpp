@@ -71,7 +71,7 @@ AudioRecorder::AudioRecorder(QWidget *parent)
 
   connect(recordButton, &QPushButton::released, this, &AudioRecorder::toggleRecording);
   //connect(stopButton, &QPushButton::clicked, this, &AudioRecorder::stopRecording);
-  connect(playButton, &QPushButton::clicked, this, &AudioRecorder::playRecording);
+  connect(playButton, &QPushButton::clicked, this, &AudioRecorder::startPlaying);
   connect(prevButton, &QPushButton::clicked, this, [this]() { emit selectPreviousSentence(); });
   connect(nextButton, &QPushButton::clicked, this, [this]() { emit selectNextSentence(); });
 
@@ -94,6 +94,8 @@ AudioRecorder::~AudioRecorder()
 
 void AudioRecorder::loadFromDisk(const QString &id)
 {
+  stopPlaying();
+
   audioData.clear();
   QString wavFileString = settings.sentenceFileInfo.absolutePath() + "/wav/" + id + ".wav";
   if(QFileInfo::exists(wavFileString)) {
@@ -140,10 +142,7 @@ void AudioRecorder::deleteFromDisk(const QString &id)
 void AudioRecorder::toggleRecording()
 {
   if(recordButton->isChecked()) {
-    if(audioSink != nullptr && audioSink->state() == QAudio::ActiveState) {
-      recordButton->setChecked(false);
-      return;
-    }
+    stopPlaying();
     if(settings.currentSentenceId.isEmpty()) {
       recordButton->setChecked(false);
       return;
@@ -300,13 +299,9 @@ void AudioRecorder::stopRecording()
   saveToDisk(settings.currentSentenceId);
 }
 
-void AudioRecorder::playRecording()
+void AudioRecorder::startPlaying()
 {
-  if(audioSink != nullptr) {
-    audioSink->stop();
-    outBuffer.close();
-    delete audioSink;
-  }
+  stopPlaying();
     
   qDebug("Starting playback!");
   
@@ -326,6 +321,16 @@ void AudioRecorder::playRecording()
   audioSink = new QAudioSink(outputDevice, format, this);
   connect(audioSink, &QAudioSink::stateChanged, this, &AudioRecorder::audioSinkStateChanged);
   audioSink->start(&outBuffer);
+}
+
+void AudioRecorder::stopPlaying()
+{
+  if(audioSink != nullptr) {
+    audioSink->stop();
+    outBuffer.close();
+    delete audioSink;
+    audioSink = nullptr;
+  }
 }
 
 void AudioRecorder::waveUpdate()

@@ -39,7 +39,8 @@ private slots:
   void startRecording();
   void appendAudioData();
   void stopRecording(); 
-  void playRecording();
+  void startPlaying();
+  void stopPlaying();
   void waveUpdate();
   
 private:
