@@ -186,54 +186,75 @@ void AudioRecorder::startRecording()
 
 void AudioRecorder::appendAudioData()
 {
+  QAudioFormat::SampleFormat sampleFormat = audioSource->format().sampleFormat();
   QByteArray data = audioIn->readAll();
-  
-  // Ignore first 1.5 seconds of audio because interface is still settling down and delivering garbage
-  if(audioSource->elapsedUSecs() < 1500000) {
-    return;
-  }
 
-  if(audioSource->format().sampleFormat() == QAudioFormat::UInt8) {
+  QVector<float> incomingAudioData;
+
+  if(sampleFormat == QAudioFormat::UInt8) {
     const quint8* samples = reinterpret_cast<const quint8*>(data.constData());
     qint64 sampleCount = data.size() / sizeof(quint8);
 
-    audioData.reserve(sampleCount);
+    incomingAudioData.reserve(sampleCount);
       
     for(int i = 0; i < sampleCount; ++i) {
       float sample = (samples[i] / 128.0) - 1.0; // Convert to float format
-      audioData.append(sample);
+      incomingAudioData.append(sample);
     }
-  } else if(audioSource->format().sampleFormat() == QAudioFormat::Int16) {
+  } else if(sampleFormat == QAudioFormat::Int16) {
     const qint16* samples = reinterpret_cast<const qint16*>(data.constData());
     qint64 sampleCount = data.size() / sizeof(qint16);
 
-    audioData.reserve(sampleCount);
+    incomingAudioData.reserve(sampleCount);
       
     for(int i = 0; i < sampleCount; ++i) {
       float sample = (samples[i] / 32768.0);  // Convert to float format
-      audioData.append(sample);
+      incomingAudioData.append(sample);
     }
-  } else if(audioSource->format().sampleFormat() == QAudioFormat::Int32) {
+  } else if(sampleFormat == QAudioFormat::Int32) {
     const qint32* samples = reinterpret_cast<const qint32*>(data.constData());
     qint64 sampleCount = data.size() / sizeof(qint32);
 
-    audioData.reserve(sampleCount);
+    incomingAudioData.reserve(sampleCount);
       
     for(int i = 0; i < sampleCount; ++i) {
       float sample = (samples[i] / 2147483648.0); // Convert to float format
-      audioData.append(sample);
+      incomingAudioData.append(sample);
     }
-  } else if(audioSource->format().sampleFormat() == QAudioFormat::Float) {
+  } else if(sampleFormat == QAudioFormat::Float) {
     const float* samples = reinterpret_cast<const float*>(data.constData());
     qint64 sampleCount = data.size() / sizeof(float);
 
-    audioData.reserve(sampleCount);
+    incomingAudioData.reserve(sampleCount);
       
     for(int i = 0; i < sampleCount; ++i) {
       float sample = (samples[i]);
-      audioData.append(sample);
+      incomingAudioData.append(sample);
     }
   }
+  // Check if audio has settled around 0.0 at least once. This probably means interface has settled into meaningful audio
+  if(audioData.isEmpty()) {
+    bool foundAbove = false;
+    for(const auto &sample: incomingAudioData) {
+      if(sample > 0.0) {
+	foundAbove = true;
+	break;
+      }
+    }
+    bool foundBelow = false;
+    for(const auto &sample: incomingAudioData) {
+      if(sample < 0.0) {
+	foundBelow = true;
+	break;
+      }
+    }
+    if(foundAbove && foundBelow) {
+      audioData.append(incomingAudioData);
+    }
+  } else {
+    audioData.append(incomingAudioData);
+  }
+
   waveUpdateTimer.start();
 }
 
