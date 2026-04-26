@@ -1,6 +1,9 @@
 #include "waveformwidget.h"
+
 #include <QPainter>
 #include <QPaintEvent>
+#include <QApplication>
+
 #include <algorithm>
 
 WaveformWidget::WaveformWidget(QVector<float> &samples, QWidget *parent)
@@ -22,6 +25,7 @@ void WaveformWidget::setState(const int &state)
   this->state = state;
   qDebug("State is: %d", state);
   update();
+  qApp->processEvents();
 }
 
 void WaveformWidget::paintEvent(QPaintEvent *event)
