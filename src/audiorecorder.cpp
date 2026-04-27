@@ -345,7 +345,11 @@ void AudioRecorder::audioSinkStateChanged(QAudio::State state)
 {
   if(state == QAudio::ActiveState) {
     waveUpdateTimer.start();
-  } else {
+  } else if(state == QAudio::IdleState) {
+    qDebug("Entered idle state, stopping playback!");
+    audioSink->stop();
+  } else if(state == QAudio::StoppedState) {
+    qDebug("Entered stopped state, resetting output!");
     waveUpdateTimer.stop();
     waveformWidget->setPlayheadPos(0);
     outBuffer.close();
