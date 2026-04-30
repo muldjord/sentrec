@@ -30,18 +30,19 @@ private slots:
 private:
   void createMenus();
   void createActions();
-  void createToolBar();
   void createMainLayout();
   void updateFromConfig();
 
   QMenuBar *menuBar;
+
   QMenu *fileMenu;
   QMenu *optionsMenu;
   QMenu *helpMenu;
+
+  QAction *loadAct;
   QAction *quitAct;
   QAction *aboutAct;
   QAction *preferencesAct;
-  QToolBar *mainFunctions;
 
   SentenceList *sentenceList;
   AudioRecorder *audioRecorder;

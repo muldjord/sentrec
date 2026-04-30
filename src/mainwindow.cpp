@@ -20,7 +20,12 @@ extern Settings settings;
 MainWindow::MainWindow()
 {
   mainWindow = this;
-  restoreGeometry(iniSettings->value("main/windowState", "").toByteArray());
+  if(iniSettings->contains("main/windowState")) {
+    restoreGeometry(iniSettings->value("main/windowState", "").toByteArray());
+  } else {
+    resize(1027, 768);
+  }
+  setWindowIcon(QIcon(":icon.png"));
   setWindowTitle("SentRec v" +
                  QString("%1.%2.%3")
                  .arg(PROJECT_VERSION_MAJOR)
@@ -32,9 +37,7 @@ MainWindow::MainWindow()
 
   createActions();
   createMenus();
-  //createToolBar();
   createMainLayout();
-
 }
 
 MainWindow::~MainWindow()
@@ -46,6 +49,8 @@ void MainWindow::createActions()
 {
   quitAct = new QAction(QIcon(":quit.png"), tr("&Quit"), this);
   connect(quitAct, &QAction::triggered, this, &MainWindow::close);
+
+  loadAct = new QAction(QIcon(":load.png"), tr("&Load sentences..."), this);
 
   preferencesAct = new QAction(QIcon(":preferences.png"), tr("&Preferences..."), this);
   connect(preferencesAct, &QAction::triggered, this, &MainWindow::showPreferences);
@@ -59,6 +64,7 @@ void MainWindow::createActions()
 void MainWindow::createMenus()
 {
   fileMenu = new QMenu(tr("&File"), this);
+  fileMenu->addAction(loadAct);
   fileMenu->addSeparator();
   fileMenu->addAction(quitAct);
 
@@ -78,16 +84,6 @@ void MainWindow::createMenus()
   qInfo("Created menu...");
 }
 
-void MainWindow::createToolBar()
-{
-  QToolBar *mainFunctions = new QToolBar(tr("Main functions"));
-  mainFunctions->setMovable(false);
-
-  addToolBar(Qt::TopToolBarArea, mainFunctions);
-
-  qInfo("Created toolbar...");
-}
-
 void MainWindow::createMainLayout()
 {
   setCentralWidget(new QWidget(this));
@@ -101,6 +97,7 @@ void MainWindow::createMainLayout()
   connect(audioRecorder, &AudioRecorder::selectPreviousSentence, sentenceList, &SentenceList::selectPreviousSentence);
   connect(audioRecorder, &AudioRecorder::selectNextSentence, sentenceList, &SentenceList::selectNextSentence);
 
+  connect(loadAct, &QAction::triggered, sentenceList, &SentenceList::loadSentences);
   connect(sentenceList, &SentenceList::sentencesLoaded, this, [this]() { audioRecorder->setEnabled(true); });
   connect(sentenceList, &SentenceList::enteringSentence, audioRecorder, &AudioRecorder::loadFromDisk);
   connect(sentenceList, &SentenceList::deleteFromDisk, audioRecorder, &AudioRecorder::deleteFromDisk);

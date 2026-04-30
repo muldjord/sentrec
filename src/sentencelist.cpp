@@ -16,6 +16,18 @@ extern Settings settings;
 SentenceList::SentenceList(QWidget *parent)
   : QWidget(parent)
 {
+  QToolBar *toolBar = new QToolBar(tr("Main functions"));
+  toolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  toolBar->setMovable(false);
+
+  QAction *loadAct = new QAction(QIcon(":load.png"), tr("&Load sentences..."), this);
+  QAction *deleteAct = new QAction(QIcon(":delete.png"), tr("&Delete selected sentence..."), this);
+  connect(loadAct, &QAction::triggered, this, &SentenceList::loadSentences);
+  connect(deleteAct, &QAction::triggered, this, &SentenceList::deleteSentence);
+
+  toolBar->addAction(loadAct);
+  toolBar->addAction(deleteAct);
+
   sentenceView = new QTableView();
   sentenceView->setSelectionBehavior(QTableView::SelectRows);
   sentenceView->setSelectionMode(QTableView::SingleSelection);
@@ -28,25 +40,12 @@ SentenceList::SentenceList(QWidget *parent)
   // When the sentence selection changes
   connect(sentenceView->selectionModel(), &QItemSelectionModel::currentChanged, this, &SentenceList::selectionChanged);
   
-  QPushButton *loadSentencesButton = new QPushButton(QIcon(":load.png"), tr("Load sentences..."), this);
-  loadSentencesButton->setIconSize(QSize(32, 32));
-  connect(loadSentencesButton, &QPushButton::clicked, this, &SentenceList::loadSentences);
-
-  QPushButton *deleteSentenceButton = new QPushButton(QIcon(":delete.png"), tr("Delete sentence"), this);
-  deleteSentenceButton->setIconSize(QSize(32, 32));
-  connect(deleteSentenceButton, &QPushButton::clicked, this, &SentenceList::deleteSentence);
-
   progressLabel = new QLabel("0 / 0");
   
-  QVBoxLayout *buttonLayout = new QVBoxLayout();
-  buttonLayout->addWidget(loadSentencesButton);
-  buttonLayout->addWidget(deleteSentenceButton);
-  buttonLayout->addStretch(1);
-  buttonLayout->addWidget(progressLabel);
-
-  QHBoxLayout *layout = new QHBoxLayout();
+  QVBoxLayout *layout = new QVBoxLayout();
+  layout->addWidget(toolBar);
   layout->addWidget(sentenceView);
-  layout->addLayout(buttonLayout);
+  layout->addWidget(progressLabel);
 
   setLayout(layout);
 }

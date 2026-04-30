@@ -19,6 +19,7 @@ public:
   SentenceList(QWidget *parent);
 
 public slots:
+  void loadSentences();
   void setSentences(const QVector<CellData> &data);
   void clearSentenceList();
   void selectPreviousSentence();
@@ -32,9 +33,8 @@ signals:
   void deleteFromDisk(const QString &id);
 
 private slots:
-  void loadSentences();
-  void saveSentences();
   void deleteSentence();
+  void saveSentences();
   void selectionChanged(const QModelIndex &current, const QModelIndex &previous);
 
 private:
