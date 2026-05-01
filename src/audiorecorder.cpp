@@ -115,6 +115,10 @@ void AudioRecorder::loadFromDisk(const QString &id)
   waveformWidget->reset();
 
   settings.currentSentenceId = id;
+
+  if(audioSink == nullptr && settings.autoPlay) {
+    startPlaying();
+  }
 }
 
 bool AudioRecorder::saveToDisk(const QString &id)

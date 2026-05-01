@@ -60,6 +60,9 @@ AudioPage::AudioPage(QSettings &settings, QWidget *parent) : QWidget(parent), se
 {
   QPushButton *resetButton = new QPushButton(tr("Reset all to defaults"));
 
+  ConfigCheckBox *autoPlayCheckBox = new ConfigCheckBox(settings, tr("Autoplay when selecting sentence that already has audio"), "audio", "autoPlay", false);
+  connect(resetButton, &QPushButton::clicked, autoPlayCheckBox, &ConfigCheckBox::resetToDefault);
+
   ConfigCheckBox *autoNormalizeCheckBox = new ConfigCheckBox(settings, tr("Normalize audio after recording"), "audio", "autoNormalize", true);
   connect(resetButton, &QPushButton::clicked, autoNormalizeCheckBox, &ConfigCheckBox::resetToDefault);
 
@@ -67,23 +70,24 @@ AudioPage::AudioPage(QSettings &settings, QWidget *parent) : QWidget(parent), se
   connect(resetButton, &QPushButton::clicked, autoTrimCheckBox, &ConfigCheckBox::resetToDefault);
 
   ConfigSlider *autoTrimPaddingSlider = new ConfigSlider(settings, "audio", "autoTrimPaddingMs", 150,
-                                                    0, 2000,
-                                                    tr("Trim padding:"), tr("milliseconds"), true);
+							 0, 2000,
+							 tr("Trim padding:"), tr("milliseconds"), true);
   connect(resetButton, &QPushButton::clicked, autoTrimPaddingSlider, &ConfigSlider::resetToDefault);
   ConfigSlider *autoTrimAvgWindowSlider = new ConfigSlider(settings, "audio", "autoTrimAvgWindowMs", 100,
-                                                    0, 200,
-                                                    tr("Trim threshold average window size:"), tr("milliseconds"), true);
+							   0, 200,
+							   tr("Trim threshold average window size:"), tr("milliseconds"), true);
   connect(resetButton, &QPushButton::clicked, autoTrimAvgWindowSlider, &ConfigSlider::resetToDefault);
 
   ConfigCheckBox *autoFadeCheckBox = new ConfigCheckBox(settings, tr("Apply fade-in/out after recording"), "audio", "autoFade", true);
   connect(resetButton, &QPushButton::clicked, autoFadeCheckBox, &ConfigCheckBox::resetToDefault);
   ConfigSlider *autoFadeLengthSlider = new ConfigSlider(settings, "audio", "autoFadeLengthMs", 20,
-                                                    0, 500,
-                                                    tr("Fade-in/out length:"), tr("milliseconds"), true);
+							0, 500,
+							tr("Fade-in/out length:"), tr("milliseconds"), true);
   connect(resetButton, &QPushButton::clicked, autoFadeLengthSlider, &ConfigSlider::resetToDefault);
 
   QVBoxLayout *layout = new QVBoxLayout();
   layout->addWidget(resetButton);
+  layout->addWidget(autoPlayCheckBox);
   layout->addWidget(autoNormalizeCheckBox);
   layout->addWidget(autoTrimCheckBox);
   layout->addWidget(autoTrimPaddingSlider);
