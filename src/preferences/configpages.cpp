@@ -63,6 +63,9 @@ AudioPage::AudioPage(QSettings &settings, QWidget *parent) : QWidget(parent), se
   ConfigCheckBox *autoPlayCheckBox = new ConfigCheckBox(settings, tr("Autoplay when selecting sentence that already has audio"), "audio", "autoPlay", false);
   connect(resetButton, &QPushButton::clicked, autoPlayCheckBox, &ConfigCheckBox::resetToDefault);
 
+  ConfigCheckBox *samplerateWarningCheckBox = new ConfigCheckBox(settings, tr("Enable samplerate mismatch warning"), "audio", "samplerateWarning", true);
+  connect(resetButton, &QPushButton::clicked, samplerateWarningCheckBox, &ConfigCheckBox::resetToDefault);
+
   ConfigCheckBox *autoNormalizeCheckBox = new ConfigCheckBox(settings, tr("Normalize audio after recording"), "audio", "autoNormalize", true);
   connect(resetButton, &QPushButton::clicked, autoNormalizeCheckBox, &ConfigCheckBox::resetToDefault);
 
@@ -88,6 +91,7 @@ AudioPage::AudioPage(QSettings &settings, QWidget *parent) : QWidget(parent), se
   QVBoxLayout *layout = new QVBoxLayout();
   layout->addWidget(resetButton);
   layout->addWidget(autoPlayCheckBox);
+  layout->addWidget(samplerateWarningCheckBox);
   layout->addWidget(autoNormalizeCheckBox);
   layout->addWidget(autoTrimCheckBox);
   layout->addWidget(autoTrimPaddingSlider);

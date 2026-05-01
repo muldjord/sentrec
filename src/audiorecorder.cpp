@@ -102,7 +102,8 @@ void AudioRecorder::loadFromDisk(const QString &id)
     qInfo("Loading wav with id '%s' into audio recorder", qPrintable(id));
     int wavSamplerate = 0;
     audioData = loadWav(wavFileString, &wavSamplerate);
-    if(settings.samplerate != wavSamplerate) {
+    if(settings.samplerateWarning &&
+       settings.samplerate != wavSamplerate) {
       QMessageBox::information(this, tr("Mismatched samplerate"),
 			       tr("Wav file: ") + wavFileString + "\n" +
 			       tr("Wav file samplerate: ") + QString::number(wavSamplerate) + "\n" +

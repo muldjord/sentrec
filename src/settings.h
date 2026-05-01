@@ -12,6 +12,7 @@ struct Settings {
   // Audio configs
   int samplerate = 44100;
   bool autoPlay = false;
+  bool samplerateWarning = true;
   bool autoTrim = true;
   bool autoNormalize = true;
   bool autoFade = true;

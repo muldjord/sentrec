@@ -134,6 +134,7 @@ void MainWindow::updateFromConfig()
   settings.samplerate = iniSettings->value("audio/samplerate", 44100).toInt();
 
   settings.autoPlay = iniSettings->value("audio/autoPlay", false).toBool();
+  settings.samplerateWarning = iniSettings->value("audio/samplerateWarning", true).toBool();
 
   settings.autoTrim = iniSettings->value("audio/autoTrim", true).toBool();
   settings.paddingMs = iniSettings->value("audio/autoTrimPaddingMs", 150).toInt();
