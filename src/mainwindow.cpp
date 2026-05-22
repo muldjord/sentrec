@@ -53,11 +53,11 @@ void MainWindow::createActions()
 
   loadAct = new QAction(QIcon(":load.png"), tr("&Load sentences..."), this);
 
+  batchProcessAct = new QAction(QIcon(":batchprocess.png"), tr("&Batch process audio files..."), this);
+  connect(batchProcessAct, &QAction::triggered, this, &MainWindow::batchProcess);
+
   preferencesAct = new QAction(QIcon(":preferences.png"), tr("&Preferences..."), this);
   connect(preferencesAct, &QAction::triggered, this, &MainWindow::showPreferences);
-
-  batchProcessAct = new QAction(QIcon(":batchprocess.png"), tr("&Batch process audio..."), this);
-  connect(batchProcessAct, &QAction::triggered, this, &MainWindow::batchProcess);
 
   aboutAct = new QAction(QIcon(":about.png"), tr("&About..."), this);
   connect(aboutAct, &QAction::triggered, this, &MainWindow::showAbout);
@@ -69,12 +69,12 @@ void MainWindow::createMenus()
 {
   fileMenu = new QMenu(tr("&File"), this);
   fileMenu->addAction(loadAct);
+  fileMenu->addAction(batchProcessAct);
   fileMenu->addSeparator();
   fileMenu->addAction(quitAct);
 
   optionsMenu = new QMenu(tr("&Options"), this);
   optionsMenu->addAction(preferencesAct);
-  optionsMenu->addAction(batchProcessAct);
 
   helpMenu = new QMenu(tr("&Help"), this);
   helpMenu->addAction(aboutAct);

@@ -293,13 +293,13 @@ void AudioRecorder::stopRecording()
   audioSource->reset();
   
   if(settings.autoTrim) {
-    audioData = AudioProcessor::cutSilence(audioData);
+    audioData = AudioProcessor::cutSilence(audioData, settings.samplerate);
   }
   if(settings.autoNormalize) {
     audioData = AudioProcessor::normalize(audioData);
   }
   if(settings.autoFade) {
-    audioData = AudioProcessor::fadeEnds(audioData);
+    audioData = AudioProcessor::fadeEnds(audioData, settings.samplerate);
   }
 
   waveformWidget->update();

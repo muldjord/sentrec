@@ -2,6 +2,8 @@
 
 #include <QDialog>
 #include <QLineEdit>
+#include <QProgressBar>
+#include <QCheckBox>
 
 class BatchProcessor : public QDialog
 {
@@ -19,4 +21,10 @@ private slots:
 private:
   QLineEdit *inputPathLineEdit = nullptr;
   QLineEdit *outputPathLineEdit = nullptr;
+
+  QCheckBox *trimCheckBox = nullptr;
+  QCheckBox *normalizeCheckBox = nullptr;
+  QCheckBox *fadeCheckBox = nullptr;
+
+  QCheckBox *askOverwriteCheckBox = nullptr;
 };
