@@ -26,6 +26,7 @@ protected slots:
 private slots:
   void showAbout();
   void showPreferences();
+  void batchProcess();
   
 private:
   void createMenus();
@@ -43,6 +44,7 @@ private:
   QAction *quitAct;
   QAction *aboutAct;
   QAction *preferencesAct;
+  QAction *batchProcessAct;
 
   SentenceList *sentenceList;
   AudioRecorder *audioRecorder;

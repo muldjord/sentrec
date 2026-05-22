@@ -37,6 +37,7 @@ set(SOURCES
   src/aboutbox.cpp
   src/audioprocessor.cpp
   src/audiorecorder.cpp
+  src/batchprocessor.cpp
   src/main.cpp
   src/mainwindow.cpp
   src/preferences/configcheckbox.cpp
