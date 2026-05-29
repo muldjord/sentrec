@@ -54,23 +54,19 @@ BatchProcessor::BatchProcessor(QWidget *parent)
   fadeCheckBox = new QCheckBox(tr("Apply fade-in and fade-out filter"), this);
   fadeCheckBox->setChecked(true);
 
-  askOverwriteCheckBox = new QCheckBox(tr("Overwrite existing output files without asking"), this);
-  askOverwriteCheckBox->setChecked(false);
-
   QPushButton *processButton = new QPushButton(QIcon(":batchprocess.png"), tr("Start processing!"), this);
   connect(processButton, &QPushButton::clicked, this, &BatchProcessor::processAll);
 
-  QPushButton *cancelButton = new QPushButton("Cancel", this);
-  connect(cancelButton, &QPushButton::clicked, this, &QDialog::reject);
+  QPushButton *closeButton = new QPushButton("Close", this);
+  connect(closeButton, &QPushButton::clicked, this, &QDialog::reject);
 
   QHBoxLayout *buttonLayout = new QHBoxLayout;
   buttonLayout->addStretch(1);
   buttonLayout->addWidget(processButton);
-  buttonLayout->addWidget(cancelButton);
+  buttonLayout->addWidget(closeButton);
 
   QVBoxLayout *layout = new QVBoxLayout;
   layout->addLayout(pathLayout);
-  layout->addWidget(askOverwriteCheckBox);
   layout->addWidget(trimCheckBox);
   layout->addWidget(normalizeCheckBox);
   layout->addWidget(fadeCheckBox);
@@ -95,6 +91,7 @@ void BatchProcessor::chooseOutputPath()
     outputPathLineEdit->setText(outputPath);
   } else {
     QMessageBox::warning(this, tr("Error"), tr("Input and output path can't be the same. The processed audio files will have the same names as the audio files from the input path. Please choose a different output path."));
+    outputPathLineEdit->setText("");
   }
 }
 
@@ -109,35 +106,58 @@ void BatchProcessor::processAll()
   if(!trimCheckBox->isChecked() &&
      !normalizeCheckBox->isChecked() &&
      !fadeCheckBox->isChecked()) {
-    QMessageBox::warning(this, tr("No filters selected"), tr("Please select one or more filters to apply to the input files."));
+    QMessageBox::warning(this, tr("No filters selected"), tr("Please select one or more filters to apply to the audio input files."));
     return;
   }
 
   QDir inputDir(inputPathLineEdit->text(), "*.wav", QDir::Name, QDir::Files | QDir::NoDotAndDotDot);
+  QDir outputDir(outputPathLineEdit->text(), "*.wav", QDir::Name, QDir::Files | QDir::NoDotAndDotDot);
   QString outputPath = outputPathLineEdit->text();
   
-  QList<QFileInfo> infoList = inputDir.entryInfoList();
-  if(infoList.isEmpty()) {
+  QList<QFileInfo> inInfoList = inputDir.entryInfoList();
+  QList<QFileInfo> outInfoList = outputDir.entryInfoList();
+
+  if(inInfoList.isEmpty()) {
     QMessageBox::information(this, tr("No input files"), tr("The input folder doesn't contain any wav files."));
     return;
   }
   
-  QProgressDialog progressDialog(tr("Processing audio files..."), tr("Cancel"), 0, infoList.length(), this);
-  //progressDialog.setWindowModality(Qt::WindowModal);
+  bool breakOnThroughToTheOtherSide = false;
+  for(const auto &outFileInfo: outInfoList) {
+    for(const auto &inFileInfo: inInfoList) {
+      if(outFileInfo.fileName() == inFileInfo.fileName()) {
+	if(QMessageBox::question(this, tr("Matching files already exist!"), tr("Matching files already exist in the output path. Would you like to overwrite them?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::No) {
+	  return;
+	} else {
+	  breakOnThroughToTheOtherSide = true;
+	  break;
+	}
+      }
+    }
+    if(breakOnThroughToTheOtherSide) {
+      break;
+    }
+  }
+
+  QProgressDialog progressDialog(tr("Processing audio files..."), tr("Cancel"), 0, inInfoList.length(), this);
+  progressDialog.setWindowModality(Qt::WindowModal);
 
   int progress = 0;
-  for(const auto &fileInfo: infoList) {
+  bool cancelled = false;
+  for(const auto &fileInfo: inInfoList) {
     progressDialog.setValue(progress);
     progress++;
+    progressDialog.setLabelText(tr("Processing: ") + fileInfo.fileName());
     qApp->processEvents();
     
     if(progressDialog.wasCanceled()) {
+      cancelled = true;
       break;
     }
 
     QString inFile = fileInfo.absoluteFilePath();
     QString outFile = outputPath + "/" + fileInfo.fileName();
-    qDebug("Processing file: %s", qPrintable(inFile));
+    qDebug("\nProcessing file: %s", qPrintable(inFile));
 
     QVector<float> audioData;
     int wavSamplerate = 0;
@@ -160,24 +180,14 @@ void BatchProcessor::processAll()
     if(audioData.isEmpty()) {
       qDebug("AudioData is empty! We're saving an empty wav file.");
     }
-    bool saveToDisk = false;
-    if(QFileInfo::exists(outFile)) {
-      if(askOverwriteCheckBox->isChecked()) {
-	saveToDisk = true;
-      } else {
-	if(QMessageBox::question(this, tr("File already exists!"), tr("Output file: ") + outFile + tr("\n\nFile already exists. Overwrite?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
-	  saveToDisk = true;
-	}
-      }
-    }
-    if(saveToDisk) {
-      qInfo("Saving wav to disk: %s", qPrintable(outFile));
-      if(!saveWav(outFile, audioData, wavSamplerate)) {
-	QMessageBox::warning(this, tr("Could not save to disk"), tr("Could not save file to disk, please check output folder permissions.\n\nOutput file: ") + outFile + "\n" + tr("Output path:") + outputPath);
-	qDebug("Could not save to disk!");
-      }
+    qInfo("Saving wav to disk: %s", qPrintable(outFile));
+    if(!saveWav(outFile, audioData, wavSamplerate)) {
+      QMessageBox::warning(this, tr("Could not save to disk"), tr("Could not save file to disk, please check output folder permissions.\n\nOutput file: ") + outFile + "\n" + tr("Output path:") + outputPath);
+      qDebug("Could not save to disk!");
     }
   }
-  progressDialog.setValue(infoList.length());
-  QMessageBox::warning(this, tr("Completed!"), tr("All audio files have been processed!"));
+  progressDialog.setValue(progressDialog.maximum());
+  if(!cancelled) {
+    QMessageBox::information(this, tr("Completed!"), tr("All audio files have been processed!"));
+  }
 }

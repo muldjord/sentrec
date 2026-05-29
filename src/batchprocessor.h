@@ -25,6 +25,4 @@ private:
   QCheckBox *trimCheckBox = nullptr;
   QCheckBox *normalizeCheckBox = nullptr;
   QCheckBox *fadeCheckBox = nullptr;
-
-  QCheckBox *askOverwriteCheckBox = nullptr;
 };

@@ -31,7 +31,7 @@ QVector<float> AudioProcessor::cutSilence(const QVector<float> &samples, const i
   avg /= avgWindow;
   
   float silThres = avg * 3.5; // Calculated silence threshold based on first avgWindow
-  qDebug("Silence threshold = %f\n", silThres);
+  qDebug("Silence threshold = %f", silThres);
   if(silThres >= 0.1) {
     QMessageBox::warning(nullptr, QObject::tr("Very high noise floor"),
 			 QObject::tr("Your input signal has a very high average noise floor (") + QString::number(silThres) + QObject::tr(" to 1.0)\n\nPlease remember to be silent when starting a recording. The first part of the recording is used to determine a noise threshold for trimming.\n\nIf you ARE already silent when starting recording your input device might be very sensitive to room noise. Consider switching to a microphone with less room sensitivity such as a dynamic microphone."),
@@ -97,7 +97,10 @@ QVector<float> AudioProcessor::normalize(const QVector<float> &samples)
   for(const auto &sample : samples) {
     maxAmp = std::max(maxAmp, std::fabs(sample));
   }
-
+  if(maxAmp == 0.0) {
+    qWarning("Audio is completely silent. Normalization cancelled!");
+    return samples;
+  }
   float gain = 0.9 / maxAmp;
 
   QVector<float> normalized = samples;
